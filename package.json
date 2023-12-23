@@ -1,0 +1,22 @@
+{
+  "name": "kibana",
+  "version": "1.0.0",
+  "description": "Kita bantu anda!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/goinesws/kibana.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/goinesws/kibana/issues"
+  },
+  "homepage": "https://github.com/goinesws/kibana#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
