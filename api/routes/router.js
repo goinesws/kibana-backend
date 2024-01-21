@@ -5,7 +5,7 @@ const userController = require('../controllers/userController');
 
 router.get('/', async (req, res) => {
   try {
-      const result = await db.any('select * from testing');
+      const result = await db.any('select * from public.client');
       res.json(result);
   } catch (error) {
       console.error('Error executing query:', error);
