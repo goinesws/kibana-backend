@@ -70,7 +70,11 @@ async function registerAsClient (email, username, name, phone, password) {
 
   if (result == null) return result;
 
-  return {username: username}; 
+  var result;
+
+  result = {'is_freelancer': false, 'is_connected_bank': false, 'profile_image_url': '', 'username': username, 'name': name, 'token': crypto.randomBytes(16).toString('hex')};
+
+  return result; 
 }
 
 async function registerAsFreelancer (freelancer, username) {
