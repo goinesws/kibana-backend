@@ -14,7 +14,7 @@ app.loginFunction = async (req, res) => {
   result = {};
 
   if (failed) {
-    result.error_schema = {error_code: 999, error_message: "Failed To Authenticate"};
+    result.error_schema = {error_code: 999, error_message: "Failed To Authenticate."};
     result.output_schema = {};
   } else { 
     result.error_schema = {error_code: 200, error_message: "Success"};
@@ -31,12 +31,38 @@ app.registerFunction = async (req, res) => {
   const phone = req.body.phone_number;
   const password = req.body.password;
 
-  output_schema = await model.registerFunction(email, username, name, phone, password);
+  output_schema = await model.registerAsClient(email, username, name, phone, password);
 
+  result = {};
+
+  if (output_schema == null) {
+    result.error_schema =  {error_code: 999, error_message: "Registration Failed."};
+    result.output_schema = {};
+  } else {
+    result.error_schema =  {error_code: 200, error_message: "Success"};
+    result.output_schema = output_schema;
+  }
+
+  res.send(result);
 }
 
 app.registerFreelancerFunction = async (req, res) => {
-  
+  const freelancer = req.body.freelancer;
+  const username = req.body.username;
+
+  output_schema = await model.registerAsFreelancer(freelancer, username);
+
+  result = {};
+
+  if (output_schema == null) {
+    result.error_schema =  {error_code: 999, error_message: "Registration Failed."};
+    result.output_schema = {};
+  } else {
+    result.error_schema =  {error_code: 200, error_message: "Success"};
+    result.output_schema = output_schema;
+  }
+
+  res.send(result);
 }
 
 
