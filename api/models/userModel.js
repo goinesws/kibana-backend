@@ -56,6 +56,7 @@ async function getLoginInfo (username, password) {
 }
 
 async function registerAsClient (email, username, name, phone, password) {
+  // Insert ke DB
   let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`
   console.log(SP);
 
@@ -70,8 +71,8 @@ async function registerAsClient (email, username, name, phone, password) {
 
   if (result == null) return result;
 
+  // return JSON ke controller
   var result;
-
   result = {'is_freelancer': false, 'is_connected_bank': false, 'profile_image_url': '', 'username': username, 'name': name, 'token': crypto.randomBytes(16).toString('hex')};
 
   return result; 
@@ -115,6 +116,8 @@ async function registerAsFreelancer (freelancer, username) {
   }
 
   if (insertResult == null) return null;
+
+  // return JSON ke controller
 
   return {freelancer: freelancer};
 }

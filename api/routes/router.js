@@ -2,6 +2,7 @@ const express = require('express');
 const router  = express.Router(); 
 const db = require('../../db');
 const userController = require('../controllers/userController');
+const taskController = require('../controllers/taskController');
 
 router.get('/', async (req, res) => {
   try {
@@ -13,10 +14,12 @@ router.get('/', async (req, res) => {
   }
 });
 
-// User Related
+// User & Auth Related
 router.post('/login', userController.loginFunction);
 router.post('/register', userController.registerFunction);
 router.post('/register-freelancer', userController.registerFreelancerFunction);
 
+// Task Related
+router.get('/api//api/task/new/:categoryId', taskController.getNewTask);
 
 module.exports = router;
