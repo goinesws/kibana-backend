@@ -1,8 +1,8 @@
 const express = require("express");
 const db = require("../../db");
 
-class Task {
-  async getNewTaskByCategory(categoryId) {
+module.exports = class Task {
+  static async getNewTaskByCategory(categoryId) {
     // get list of SUBCAT BY CATEGORY ID
     let SPGetSubcat = `select subcategory_id from public.subcategory where category_id = '${categoryId}';`;
 
@@ -39,23 +39,25 @@ class Task {
     return result;
   }
 
-  async getTaskCategoryDetails(categoryId) {}
+  static async getTaskCategoryDetails(categoryId) {}
 
-  async getTaskCategories() {
+  static async getTaskCategories() {
     var result = {};
 
     let SPGetCategories = `select category_id as id, name, image from public.category`;
 
     result = await db.any(SPGetCategories);
 
-    if (length == 0) {
+    if (result.ength == 0) {
       return null;
     }
 
     console.log(result);
 
     // get count
-    for (var i = 0; i < result.length; i++) {}
+    for (var i = 0; i < result.length; i++) {
+      
+    }
 
     let SPGetSubcategories = ``;
 
@@ -63,4 +65,4 @@ class Task {
   }
 }
 
-module.exports = { Task };
+ 

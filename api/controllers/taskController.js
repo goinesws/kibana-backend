@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const model = require('../models/taskModel');
+const task = require('../models/taskModel.js')
 
 app.getNewTaskByCategory = async (req, res) =>  {
   console.log(req.params);
@@ -9,16 +9,16 @@ app.getNewTaskByCategory = async (req, res) =>  {
   result.error_schema = {};
   result.output_schema = {task: ''};
 
-  let modelResult = await model.getNewTaskByCategory(req.params.categoryId);
+  let taskResult = await task.getNewTaskByCategory(req.params.categoryId);
 
-  console.log(modelResult);
+  console.log(taskResult);
 
-  if (modelResult == null) {
+  if (taskResult == null) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
-    result.output_schema.task = modelResult;
+    result.output_schema.task = taskResult;
   } else {
     result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
-    result.output_schema.task = modelResult;
+    result.output_schema.task = taskResult;
   }
 
   res.send(result);
@@ -34,16 +34,16 @@ app.getTaskCategories = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {categories: ''};
 
-  let modelResult = await model.getTaskCategories();
+  let taskResult = await task.getTaskCategories();
 
-  console.log(modelResult);
+  console.log(taskResult);
 
-  if (modelResult == null) {
+  if (taskResult == null) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
-    result.output_schema.categories = modelResult;
+    result.output_schema.categories = taskResult;
   } else {
     result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
-    result.output_schema.categories = modelResult;
+    result.output_schema.categories = taskResult;
   }
 
   res.send(result);
