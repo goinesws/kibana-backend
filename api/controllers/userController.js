@@ -14,10 +14,10 @@ app.loginFunction = async (req, res) => {
   result = {};
 
   if (failed) {
-    result.error_schema = {error_code: 999, error_message: "Failed To Authenticate."};
+    result.error_schema = {error_code: 999, error_message: "Login Gagal."};
     result.output_schema = {};
   } else { 
-    result.error_schema = {error_code: 200, error_message: "Success"};
+    result.error_schema = {error_code: 200, error_message: "Sukses."};
     result.output_schema = output_schema;
   }
 
@@ -36,10 +36,10 @@ app.registerFunction = async (req, res) => {
   result = {};
 
   if (output_schema == null) {
-    result.error_schema =  {error_code: 999, error_message: "Registration Failed."};
+    result.error_schema =  {error_code: 999, error_message: "Registrasi Gagal."};
     result.output_schema = {};
   } else {
-    result.error_schema =  {error_code: 200, error_message: "Success"};
+    result.error_schema =  {error_code: 200, error_message: "Sukses."};
     result.output_schema = output_schema;
   }
 

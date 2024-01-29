@@ -20,6 +20,10 @@ router.post('/register', userController.registerFunction);
 router.post('/register-freelancer', userController.registerFreelancerFunction);
 
 // Task Related
-router.get('/api//api/task/new/:categoryId', taskController.getNewTask);
+router.get('/api/task/new/:categoryId', taskController.getNewTaskByCategory);
+router.get('/api/task/category/:categoryId/details', taskController.getTaskCategoryDetails);
+router.get('/api/task/category', taskController.getTaskCategories);
+
+
 
 module.exports = router;
