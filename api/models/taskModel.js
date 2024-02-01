@@ -48,18 +48,39 @@ module.exports = class Task {
 
     result = await db.any(SPGetCategories);
 
-    if (result.ength == 0) {
+    if (result.length == 0) {
       return null;
     }
+  
+    // get subcategories
+    
+    // get all the subcategories for each category
+    for (let i = 0; i < result.length; i++) {
+      let spGetSubcategories = `select subcategory_id as id, name from public.subcategory where category_id ='${result[i].id}'`;
 
-    console.log(result);
+      var subcatResult = {};
 
-    // get count
-    for (var i = 0; i < result.length; i++) {
-      
+      subcatResult = await db.any(spGetSubcategories);
+
+      // get amount based on subcat
+
+      let count = 0;
+
+      for (let j = 0; j < subcatResult.length; j++) {
+        let spGetCount = `select count(*) from public.task where sub_category_id = '${subcatResult[j].id}'`;
+
+        var countResult ={};
+        
+        countResult = await db.any(spGetCount);
+
+        console.log(countResult);
+
+        count +=  parseInt(countResult[0].count);
+      }
+
+      result[i].task_amount = count;
+      result[i].sub_categories = subcatResult;
     }
-
-    let SPGetSubcategories = ``;
 
     return result;
   }
