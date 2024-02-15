@@ -70,16 +70,15 @@ module.exports = class Task {
     return result;
   }
 
-  static async getTaskCategoryDetails(categoryId) {
+  static async getTaskCategoryDetail(categoryId) {
     var result = {};
 
-    let SPGetCategories = `select * from public.subcategory where category_id = '${categoryId}'`;
+    let SPGetCategories = `select subcategory_id as id, name, description as desc, image as image_url from subcategory where category_id = '${categoryId}'`;
 
     result = await db.any(SPGetCategories);
 
-    if (result.length == 0) {
-      return null;
-    }
+    if (result.length == 0) return null;
+    else return result;
   }
 
   static async getTaskCategories() {

@@ -21,8 +21,8 @@ router.post('/register-freelancer', userController.registerFreelancerFunction);
 
 // Task Related
 router.get('/api/task/new/:categoryId', taskController.getNewTaskByCategory);
-router.get('/api/task/category/:categoryId/details', taskController.getTaskCategoryDetails);
+router.get('/api/task/category/:categoryId/detail', taskController.getTaskCategoryDetail);
 router.get('/api/task/category', taskController.getTaskCategories);
-router.post('api/task/list', taskController.getTaskList);
+// router.post('api/task/list', taskController.getTaskList);
 
 module.exports = router;

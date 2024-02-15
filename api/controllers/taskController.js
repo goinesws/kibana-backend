@@ -24,8 +24,25 @@ app.getNewTaskByCategory = async (req, res) =>  {
   res.send(result);
 }
 
-app.getTaskCategoryDetails = async (req, res) => {
-  res.send('HAlo');
+app.getTaskCategoryDetail = async (req, res) => {
+  var result = {};
+
+  result.error_schema = {};
+  result.output_schema = {sub_categories: ''};
+
+  let taskResult = await task.getTaskCategoryDetail(req.params.categoryId);
+
+  console.log(taskResult);
+
+  if (taskResult == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema.sub_categories = taskResult;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema.sub_categories = taskResult;
+  }
+
+  res.send(result);
 }
 
 app.getTaskCategories = async (req, res) => {
