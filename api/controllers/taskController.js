@@ -66,4 +66,25 @@ app.getTaskCategories = async (req, res) => {
   res.send(result);
 }
 
+app.getTaskDetails = async (req, res) => {
+  var result = {};
+
+  result.error_schema = {};
+  result.output_schema = {};
+
+  let taskDetailResult = await task.getTaskDetails(req.params.taskId);
+
+  console.log(taskDetailResult);
+
+  if (taskDetailResult == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema.categories = taskDetailResult;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema.categories = taskDetailResult;
+  }
+  
+  res.send(result);
+}
+
 module.exports = app;
