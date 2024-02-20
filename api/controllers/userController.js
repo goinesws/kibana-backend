@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const user = require('../models/userModel')
+const user = require('../models/userModel');
 
 app.loginFunction = async (req, res) => {
   const username = req.body.username_email;
