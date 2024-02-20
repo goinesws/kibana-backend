@@ -3,6 +3,7 @@ const router  = express.Router();
 const db = require('../../db');
 const userController = require('../controllers/userController');
 const taskController = require('../controllers/taskController');
+const serviceController = require('../controllers/serviceController');
 
 router.get('/', async (req, res) => {
   try {
@@ -27,5 +28,8 @@ router.get('/api/task/category', taskController.getTaskCategories);
 router.get('/api/task/detail/:taskId', taskController.getTaskDetails);
 
 // Service Related
+router.get('/api/service/new/:categoryId', serviceController.getNewService);
+router.get('/api/service/new', serviceController.getNewService);
+
 
 module.exports = router;
