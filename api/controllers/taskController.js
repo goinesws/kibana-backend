@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const task = require('../models/taskModel.js');
+const Task = require('../models/taskModel.js');
 
 app.getNewTaskByCategory = async (req, res) =>  {
   console.log(req.params);
@@ -9,7 +9,7 @@ app.getNewTaskByCategory = async (req, res) =>  {
   result.error_schema = {};
   result.output_schema = {tasks: ''};
 
-  let taskResult = await task.getNewTaskByCategory(req.params.categoryId);
+  let taskResult = await Task.getNewTaskByCategory(req.params.categoryId);
 
   // console.log(taskResult);
 
@@ -30,7 +30,7 @@ app.getTaskCategoryDetail = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {sub_categories: ''};
 
-  let taskResult = await task.getTaskCategoryDetail(req.params.categoryId);
+  let taskResult = await Task.getTaskCategoryDetail(req.params.categoryId);
 
   // console.log(taskResult);
 
@@ -51,7 +51,7 @@ app.getTaskCategories = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {categories: ''};
 
-  let taskResult = await task.getTaskCategories();
+  let taskResult = await Task.getTaskCategories();
 
   // console.log(taskResult);
 
@@ -72,7 +72,7 @@ app.getTaskDetails = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {};
 
-  let taskDetailResult = await task.getTaskDetails(req.params.taskId);
+  let taskDetailResult = await Task.getTaskDetails(req.params.taskId);
 
   // console.log(taskDetailResult);
 
@@ -95,7 +95,7 @@ app.getTaskList = async (req, res) => {
   result.output_schema = {};
 
 
-  let taskListResult = await task.getTaskList(req.headers);
+  let taskListResult = await Task.getTaskList(req.headers);
   let total_amount = taskListResult.length;
   let has_next_page = true;
 

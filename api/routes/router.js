@@ -5,6 +5,8 @@ const userController = require('../controllers/userController');
 const taskController = require('../controllers/taskController');
 const serviceController = require('../controllers/serviceController');
 const subcategoryController = require('../controllers/subcategoryController');
+const clientController = require('../controllers/clientController');
+const freelancerController = require('../controllers/freelancerController');
 const Subcategory = require('../models/subcategoryModel');
 
 router.get('/', async (req, res) => {
@@ -35,5 +37,8 @@ router.get('/api/service/new', serviceController.getNewService);
 
 router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
 
+// Account Related
+router.get('/api/account/profile/:userId', clientController.getOtherProfile)
+router.get('/api/account/description/:userId', freelancerController.getFreelancerDescription)
 
 module.exports = router;

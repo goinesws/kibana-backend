@@ -25,4 +25,24 @@ module.exports = class Freelancer {
 
     return result;
   }
+
+  static async isFreelancer (userId) {
+    let SPGetIsFreelancer = `select count(*) from public.freelancer where user_id = '${userId}';`
+
+    let result = await db.any(SPGetIsFreelancer);
+
+    if (result[0].count > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static async getDesc (userId) {
+    let SP = `select description from public.freelancer where user_id='${userId}'`;
+
+    let result = await db.any(SP);
+
+    return result[0];
+  }
 }
