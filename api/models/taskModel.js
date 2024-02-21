@@ -9,34 +9,46 @@ const { search } = require("../controllers/userController");
 
 module.exports = class Task {
   // Task non-auth (bisa di akses oleh public)
-  static async getTaskList(req, res) {
-    const searchText = req.body.search_text;
-    const subcategory = req.body.sub_category;
-    const budget = req.body.budget;
-    const budgetStart = req.body.budget.budget_start;
-    const budgetEnd = req.body.budget.budget_end;
-    const difficulty = req.body.difficulty;
-    const lastId = req.body.last_id;
+  static async getTaskList(headers) {
+    console.log(headers);
+    const searchText = headers['search_text'];
+    const subcategory = headers['sub_category'];
+    const budget = headers['budget'];
+    const budgetStart = headers['budget']['budget_start'];
+    const budgetEnd = headers['budget']['budget_end'];
+    const difficulty = headers['difficulty'];
+    const lastId = headers['last_id'];
+
+    console.log(subcategory);
     let SP = `
-      SELECT * FROM public.task
-      WHERE (name || description ILIKE '%${searchText}%'
-      OR '${searchText}' ILIKE ANY (tags))
-    `;
-    if (subcategory !== null) {
-      SP += `AND sub_category_id WHERE '${subcategories}'`;
+      SELECT task_id as id, name, description, tags, deadline as due_date, difficulty, price FROM public.task`;
+
+    if (searchText !== "") {
+      SP += ` WHERE (name || description ILIKE '%${searchText}%'
+      OR '${searchText}' ILIKE ANY (tags))`;
     }
-    if (budget !== null) {
+    if (subcategory !== "") {
+      if(searchText!=="") SP !=` AND`
+      SP += ` WHERE sub_category_id = '${subcategory}'`;
+    }
+    if (budget !== "") {
+      if(searchText!=="" || subcategory!=="") SP !=` AND`
       if (budgetEnd !== null) {
-        SP += `AND price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
+        SP += ` AND price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
       } else {
-        SP += `AND price > '${budgetStart}'`;
+        SP += ` AND price > '${budgetStart}'`;
       }
     }
-    if (difficulty !== null) {
+
+    if (difficulty !== "") {
+      if(searchText!=="" || subcategory!=="" || budget!=="") SP !=` AND`
       SP += `AND difficulty = '${difficulty}'`;
     }
 
-    result = await db.any(SPGetCategories);
+    let result = await db.any(SP);
+    console.log(result);
+
+    return result;
   }
 
   static async getNewTaskByCategory(categoryId) {
