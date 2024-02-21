@@ -72,6 +72,32 @@ class Service {
             throw new Error('Failed to fetch user tasks');
         }
     }
+
+    // static async getSubcategoryByCategory(category_id) {
+    //     try {
+    //         var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
+    //         inner join subcategory on
+    //         subcategory.subcategory_id = service.subcategory_id
+    //         where subcategory.category_id = '${category_id}'`;
+    //         const result = await db.any(SP);
+    //         return result;
+    //     } catch (error) {
+    //         throw new Error('Failed to fetch user tasks');
+    //     }
+    // }
+
+    static async getServiceByCategory(category_id) {
+        try {
+            var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
+            inner join subcategory on
+            subcategory.subcategory_id = service.subcategory_id
+            where subcategory.category_id = '${category_id}'`;
+            const result = await db.any(SP);
+            return result;
+        } catch (error) {
+            throw new Error('Failed to fetch user tasks');
+        }
+    }
 }
 
 module.exports = Service;

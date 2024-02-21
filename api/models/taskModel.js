@@ -46,7 +46,6 @@ module.exports = class Task {
     }
 
     let result = await db.any(SP);
-    console.log(result);
 
     return result;
   }

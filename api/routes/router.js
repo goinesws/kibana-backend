@@ -4,6 +4,8 @@ const db = require('../../db');
 const userController = require('../controllers/userController');
 const taskController = require('../controllers/taskController');
 const serviceController = require('../controllers/serviceController');
+const subcategoryController = require('../controllers/subcategoryController');
+const Subcategory = require('../models/subcategoryModel');
 
 router.get('/', async (req, res) => {
   try {
@@ -30,6 +32,8 @@ router.get('/api/task/detail/:taskId', taskController.getTaskDetails);
 // Service Related
 router.get('/api/service/new/:categoryId', serviceController.getNewService);
 router.get('/api/service/new', serviceController.getNewService);
+
+router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
 
 
 module.exports = router;
