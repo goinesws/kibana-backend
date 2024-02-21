@@ -3,6 +3,9 @@ const router  = express.Router();
 const db = require('../../db');
 const userController = require('../controllers/userController');
 const taskController = require('../controllers/taskController');
+const serviceController = require('../controllers/serviceController');
+const subcategoryController = require('../controllers/subcategoryController');
+const Subcategory = require('../models/subcategoryModel');
 
 router.get('/', async (req, res) => {
   try {
@@ -23,9 +26,14 @@ router.post('/register-freelancer', userController.registerFreelancerFunction);
 router.get('/api/task/new/:categoryId', taskController.getNewTaskByCategory);
 router.get('/api/task/category/:categoryId/detail', taskController.getTaskCategoryDetail);
 router.get('/api/task/category', taskController.getTaskCategories);
-// router.post('api/task/list', taskController.getTaskList);
+router.post('/api/task/list', taskController.getTaskList);
 router.get('/api/task/detail/:taskId', taskController.getTaskDetails);
 
 // Service Related
+router.get('/api/service/new/:categoryId', serviceController.getNewService);
+router.get('/api/service/new', serviceController.getNewService);
+
+router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
+
 
 module.exports = router;
