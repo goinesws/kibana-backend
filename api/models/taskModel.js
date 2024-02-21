@@ -10,7 +10,6 @@ const { search } = require("../controllers/userController");
 module.exports = class Task {
   // Task non-auth (bisa di akses oleh public)
   static async getTaskList(headers) {
-    console.log(headers);
     const searchText = headers['search_text'];
     const subcategory = headers['sub_category'];
     const budget = headers['budget'];
@@ -19,7 +18,6 @@ module.exports = class Task {
     const difficulty = headers['difficulty'];
     const lastId = headers['last_id'];
 
-    console.log(subcategory);
     let SP = `
       SELECT task_id as id, name, description, tags, deadline as due_date, difficulty, price FROM public.task`;
 
@@ -93,7 +91,7 @@ module.exports = class Task {
       for (let j = 0; j < subcatResult.length; j++) {       
         let countResult = await Subcategory.getSubcatCountByID(subcatResult[j].id);
         // console.log('Count Result di Task Model');
-        console.log(countResult.count);
+        // console.log(countResult.count);
         count +=  parseInt(countResult.count);
       }
       result[i].task_amount = count;

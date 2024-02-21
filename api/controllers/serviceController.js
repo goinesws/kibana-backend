@@ -6,7 +6,7 @@ const Subcategory = require('../models/subcategoryModel.js')
 app.getNewService = async (req, res) =>  {
   var result = {};
   result.error_schema = {};
-  result.output_schema = {task: ''};
+  result.output_schema = {services: ''};
 
   const category_id = req.params.categoryId;
 
@@ -29,7 +29,7 @@ app.getNewService = async (req, res) =>  {
 app.getServiceByCategory = async (req, res) =>  {
   var result = {};
   result.error_schema = {};
-  result.output_schema = {task: ''};
+  result.output_schema = {services: ''};
 
   const category_id = req.params.categoryId;
 
