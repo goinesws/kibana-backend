@@ -8,7 +8,6 @@ const Review = require("../models/reviewModel");
 const { search } = require("../controllers/userController");
 
 module.exports = class Task {
-  // Task non-auth (bisa di akses oleh public)
   static async getTaskList(headers) {
     console.log(headers);
     const searchText = headers['search_text'];
