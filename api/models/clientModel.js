@@ -16,4 +16,12 @@ module.exports = class Client {
 
     return result[0];
   }
+
+  static async getOtherClientProfile (userId) {
+    let SPGetClientDetails = `select client_id as id, profile_image as profile_image_url, name, client_id as username from public.client where client_id = '${userId}'; `
+
+    let result = await db.any(SPGetClientDetails);
+
+    return result[0];
+  }
 }
