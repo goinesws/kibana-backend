@@ -12,34 +12,38 @@ module.exports = class Task {
     const searchText = headers['search_text'];
     const subcategory = headers['sub_category'];
     const budget = headers['budget'];
-    const budgetStart = headers['budget']['budget_start'];
-    const budgetEnd = headers['budget']['budget_end'];
     const difficulty = headers['difficulty'];
     const lastId = headers['last_id'];
 
-    let SP = `
-      SELECT task_id as id, name, description, tags, deadline as due_date, difficulty, price FROM public.task`;
+    let SP = `SELECT task_id as id, name, description, tags, deadline as due_date, difficulty, price FROM public.task`;
 
     if (searchText !== "") {
       SP += ` WHERE (name || description ILIKE '%${searchText}%'
       OR '${searchText}' ILIKE ANY (tags))`;
     }
     if (subcategory !== "") {
-      if(searchText!=="") SP !=` AND`
-      SP += ` WHERE sub_category_id = '${subcategory}'`;
+      if(searchText!=="") SP +=` AND`
+      else SP += ` WHERE`
+      SP += ` sub_category_id = '${subcategory}'`;
     }
     if (budget !== "") {
-      if(searchText!=="" || subcategory!=="") SP !=` AND`
-      if (budgetEnd !== null) {
-        SP += ` AND price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
+      const budgetObject = JSON.parse(budget);
+      const budgetStart = budgetObject.budget_start;
+      const budgetEnd = budgetObject.budget_end;
+
+      if(searchText!=="" || subcategory!=="") SP +=` AND`
+      else SP += ` WHERE`
+      if (budget.budget_end !== null) {
+        SP += ` price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
       } else {
-        SP += ` AND price > '${budgetStart}'`;
+        SP += ` price > '${budgetStart}'`;
       }
     }
 
     if (difficulty !== "") {
-      if(searchText!=="" || subcategory!=="" || budget!=="") SP !=` AND`
-      SP += `AND difficulty = '${difficulty}'`;
+      if(searchText!=="" || subcategory!=="" || budget!=="") SP +=` AND`
+      else SP += ` WHERE`
+      SP += ` difficulty = '${difficulty}'`;
     }
 
     let result = await db.any(SP);

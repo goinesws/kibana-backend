@@ -88,12 +88,10 @@ app.getTaskDetails = async (req, res) => {
 }
 
 app.getTaskList = async (req, res) => {
-  console.log("masuk");
   var result = {};
 
   result.error_schema = {};
   result.output_schema = {};
-
 
   let taskListResult = await Task.getTaskList(req.headers);
   let total_amount = taskListResult.length;
@@ -114,7 +112,7 @@ app.getTaskList = async (req, res) => {
     else has_next_page = false;
   }
 
-  if (taskListResult == null) {
+  if (taskListResult == "" || taskListResult == null) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
     result.output_schema.tasks = taskListResult;
   } else {
@@ -122,7 +120,7 @@ app.getTaskList = async (req, res) => {
     result.output_schema.tasks = taskListResult;
     result.output_schema.total_amount = total_amount;
     result.output_schema.has_next_page = has_next_page;
-    result.output_schema.last_id = "GATAU";
+    result.output_schema.last_id = taskListResult[taskListResult.length - 1].id;
   }
   
   res.send(result);
