@@ -35,6 +35,7 @@ router.get('/api/task/detail/:taskId', taskController.getTaskDetails);
 // Service Related
 router.get('/api/service/new/:categoryId', serviceController.getNewService);
 router.get('/api/service/new', serviceController.getNewService);
+router.get('/api/service/list', serviceController.getServiceList);
 
 router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
 
