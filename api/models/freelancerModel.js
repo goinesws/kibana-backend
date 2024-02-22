@@ -45,4 +45,63 @@ module.exports = class Freelancer {
 
     return result[0];
   }
+
+  static async getEducationHistory (userId) {
+    let SP = `
+    select degree, major, university, country, year as graduation_year from public.education p
+    join
+    public.freelancer f
+    on
+    p.freelancer_id = f.freelancer_id
+    where
+    f.user_id = '${userId}'
+    `;
+
+    let result = await db.any(SP);
+
+    return result;
+  }
+
+  static async getSkill (userId) {
+    let SP = `select skills from public.freelancer where user_id = '${userId}';`
+
+    console.log(SP);
+
+    let result = await db.any(SP);
+
+    return result[0].skills;
+  }
+
+  static async getCV (userId) {
+    let SP = `
+    select cv as cv_url from public.freelancer where user_id = '${userId}';
+    `;
+
+    let result = await db.any(SP);
+
+    return result[0];
+  }
+
+  static async getPortfolio (userId) {
+    let SP = `
+    select portfolio as portfolio_url from public.freelancer where user_id = '${userId}';
+    `;
+
+    let result = await db.any(SP);
+    console.log(result[0])
+
+    return result[0];
+  }
+
+  static async getOwnedService (userId) {
+    let SPGetService = `select s.service_id as id, s.images as image_url, s.name, s.tags, s.price, s.working_time from public.service s 
+    join 
+    public.freelancer f 
+    on 
+    f.freelancer_id = s.freelancer_id
+    where 
+    f.user_id = '${userId}'; `;
+
+    
+  }
 }

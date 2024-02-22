@@ -24,49 +24,94 @@ app.getFreelancerDescription = async (req,res) => {
 
 app.getFreelancerEducationHistory = async (req,res) => {
   let result = {};
+  let userId = req.params.userId;
 
   result.error_schema = {};
   result.output_schema = {};
 
-  return result;
+  let edu = await Freelancer.getEducationHistory(userId);
+
+  console.log(edu);
+
+  if (edu == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema.education_history = null;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema.education_history = edu;
+  }
+
+  return res.send(result);
 }
 
 app.getFreelancerSkill = async (req,res) => {
   let result = {};
+  let userId = req.params.userId;
 
   result.error_schema = {};
   result.output_schema = {};
 
-  return result;
+  let skills = await Freelancer.getSkill(userId);
+  
+  if (skills == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema.skills = null;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema.skills = skills;
+  }
+
+  res.send(result);
 }
 
-app.getFreelancerVC = async (req,res) => {
+app.getFreelancerCV = async (req,res) => {
+  let result = {};
+  let userId = req.params.userId;
+
+  result.error_schema = {};
+  result.output_schema = {};
+
+  let CV = await Freelancer.getCV(userId);
+
+  if (CV == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema = null;
+  } else {  
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema = CV;
+  }
+
+  res.send(result);
+}
+
+
+app.getPortfolio = async (req,res) => {
+  let result = {};
+  let userId = req.params.userId;
+
+  result.error_schema = {};
+  result.output_schema = {};
+
+  let portfolio = await Freelancer.getPortfolio(userId);
+
+  if (portfolio == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema = null;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema = portfolio;
+  }
+
+  res.send(result);
+}
+
+app.getOwnedService = async (req,res) => {
   let result = {};
 
   result.error_schema = {};
   result.output_schema = {};
 
-  return result;
-}
-
-
-app.getPortofolio = async (req,res) => {
-  let result = {};
-
-  result.error_schema = {};
-  result.output_schema = {};
-
-  return result;
-}
-
-
-app.getOwnedTask = async (req,res) => {
-  let result = {};
-
-  result.error_schema = {};
-  result.output_schema = {};
-
-  return result;
+  res.send(result);
 }
 
 module.exports = app;
