@@ -59,27 +59,27 @@ app.getServiceList = async (req, res) =>  {
   if(req.headers.last_id !== "") {
     const indexOfTarget = serviceListResult.findIndex(obj => obj.id === req.headers.last_id)
     if (indexOfTarget !== -1) {
-      serviceListResult = serviceListResult.slice(indexOfTarget + 1, indexOfTarget + 9);
+      serviceListResult = serviceListResult.slice(indexOfTarget + 1, indexOfTarget + 13);
     } else {
       console.log('Object with specified id not found.');
     }
-    if(total_amount - (indexOfTarget + 1) > 8) has_next_page = true;
+    if(total_amount - (indexOfTarget + 1) > 12) has_next_page = true;
     else has_next_page = false;
   } else {
-    taskListResult = taskListResult.slice(0, 8);
+    serviceListResult = serviceListResult.slice(0, 12);
     if(total_amount > 8) has_next_page = true;
     else has_next_page = false;
   }
 
-  if (taskListResult == null) {
+  if (serviceListResult == "" || serviceListResult == null) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
-    result.output_schema.services = taskListResult;
+    result.output_schema.services = serviceListResult;
   } else {
     result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
-    result.output_schema.services = taskListResult;
+    result.output_schema.services = serviceListResult;
     result.output_schema.total_amount = total_amount;
     result.output_schema.has_next_page = has_next_page;
-    result.output_schema.last_id = "GATAU";
+    result.output_schema.last_id = serviceListResult[serviceListResult.length - 1].id;
   }
   
   res.send(result);
