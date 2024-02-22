@@ -18,7 +18,8 @@ module.exports = class Client {
   }
 
   static async getOtherClientProfile (userId) {
-    let SPGetClientDetails = `select client_id as id, profile_image as profile_image_url, name, client_id as username from public.client where client_id = '${userId}'; `
+    let SPGetClientDetails = `select client_id as id, profile_image as profile_image_url, name, username from public.client 
+    where client_id = '${userId}'; `
 
     let result = await db.any(SPGetClientDetails);
 
