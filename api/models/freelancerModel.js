@@ -102,6 +102,27 @@ module.exports = class Freelancer {
     where 
     f.user_id = '${userId}'; `;
 
-    
+    let SPGetFreealancer = `select profile_image as profile_image_url, name from public.client where client_id = '${userId}';`;
+
+    let result = await db.any(SPGetService);
+
+    let resultFreelancer = await db.any(SPGetFreealancer);
+
+    for (var i = 0; i < result.length; i++) {
+      console.log("hi");
+      let serviceId = result[i].id;
+      
+      let SPGetReviewTotal = `select count(*) from public.review where destination_id = '${serviceId}';`;
+      let SPGetReviewAverage = `select round(avg(rating), 1) as avg from public.review where destination_id = '${serviceId}';`;
+      result[i].freelancer = resultFreelancer[0];
+      let avg_placeholder = await db.any(SPGetReviewAverage);
+      result[i].average_rating = avg_placeholder[0].avg;
+      let amt_placeholder = await db.any(SPGetReviewTotal);
+      result[i].rating_amount = amt_placeholder[0].count;
+    }
+
+    // console.log(result);
+
+    return result;
   }
 }

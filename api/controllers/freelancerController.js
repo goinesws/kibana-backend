@@ -107,9 +107,20 @@ app.getPortfolio = async (req,res) => {
 
 app.getOwnedService = async (req,res) => {
   let result = {};
+  let userId = req.params.userId;
 
   result.error_schema = {};
   result.output_schema = {};
+
+  let owned_service = await Freelancer.getOwnedService(userId);
+
+  if (result == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema = null;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema = owned_service;
+  }
 
   res.send(result);
 }

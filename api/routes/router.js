@@ -50,6 +50,6 @@ router.get('/api/account/educations/:userId', freelancerController.getFreelancer
 router.get('/api/account/skills/:userId', freelancerController.getFreelancerSkill);
 router.get('/api/account/cv/:userId', freelancerController.getFreelancerCV);
 router.get('/api/account/portfolio/:userId', freelancerController.getPortfolio);
-router.get('/api/account/services/:userId', freelancerController.getOwnedTask);
+router.get('/api/account/services/:userId', freelancerController.getOwnedService);
 
 module.exports = router;
