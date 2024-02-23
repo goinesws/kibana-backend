@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const Service = require('../models/serviceModel.js')
+const Freelancer = require('../models/freelancerModel.js')
 const Subcategory = require('../models/subcategoryModel.js')
 
 app.getNewService = async (req, res) =>  {
@@ -82,6 +83,35 @@ app.getServiceList = async (req, res) =>  {
     result.output_schema.last_id = serviceListResult[serviceListResult.length - 1].id;
   }
   
+  res.send(result);
+}
+
+app.getServiceDetail = async (req, res) =>  {
+  var result = {};
+  result.error_schema = {};
+  result.output_schema = {service_detail: ''};
+
+  const service_id = req.params.serviceId;
+
+  const service = new Service();
+  var serviceResult = await Service.getServiceDetail(service_id);
+
+  const freelancer = new Freelancer();
+  var freelancerResult = await Freelancer.getFreelancerByServiceId(service_id);
+
+  var reviewResult = await Service.getServiceReview(service_id);
+
+  if (Array.isArray(serviceResult) && serviceResult.length === 0) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema.service_detail = serviceResult;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema.service_detail = serviceResult;
+    result.output_schema.freelancer = freelancerResult;
+    result.output_schema.review = reviewResult;
+
+  }
+
   res.send(result);
 }
 

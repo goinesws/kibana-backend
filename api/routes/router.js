@@ -36,6 +36,8 @@ router.get('/api/task/detail/:taskId', taskController.getTaskDetails);
 router.get('/api/service/new/:categoryId', serviceController.getNewService);
 router.get('/api/service/new', serviceController.getNewService);
 router.get('/api/service/list', serviceController.getServiceList);
+router.get('/api/service/detail/:serviceId', serviceController.getServiceDetail);
+
 
 router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
 
@@ -44,12 +46,12 @@ router.get('/api/service/category', categoryController.getAllCategorySubcategory
 
 
 // Account Related
-router.get('/api/account/profile/:userId', clientController.getOtherProfile);
-router.get('/api/account/description/:userId', freelancerController.getFreelancerDescription);
-router.get('/api/account/educations/:userId', freelancerController.getFreelancerEducationHistory);
-router.get('/api/account/skills/:userId', freelancerController.getFreelancerSkill);
-router.get('/api/account/cv/:userId', freelancerController.getFreelancerCV);
-router.get('/api/account/portfolio/:userId', freelancerController.getPortfolio);
-router.get('/api/account/services/:userId', freelancerController.getOwnedTask);
+// router.get('/api/account/profile/:userId', clientController.getOtherProfile);
+// router.get('/api/account/description/:userId', freelancerController.getFreelancerDescription);
+// router.get('/api/account/educations/:userId', freelancerController.getFreelancerEducationHistory);
+// router.get('/api/account/skills/:userId', freelancerController.getFreelancerSkill);
+// router.get('/api/account/cv/:userId', freelancerController.getFreelancerCV);
+// router.get('/api/account/portfolio/:userId', freelancerController.getPortfolio);
+// router.get('/api/account/services/:userId', freelancerController.getOwnedTask);
 
 module.exports = router;
