@@ -1,5 +1,6 @@
 const express = require("express");
 const db = require("../../db");
+const Order = require("../models/orderModel");
 
 module.exports = class Freelancer {
   static async getFreelancerByTaskID(taskId) {
@@ -144,4 +145,68 @@ module.exports = class Freelancer {
     return result[0];
   }
 
+
+  static async getFreelancerAverageRating (userId) {
+    let SP = `
+    select 
+    avg(r.rating)
+    from 
+    public.review r
+    join 
+    public.order o
+    on
+    r.transaction_id = o.order_id
+    join
+    public.service s
+    on
+    o.service_id = s.service_id
+    join
+    public.freelancer f
+    on
+    s.freelancer_id = f.freelancer_id
+    where
+    f.user_id = '${userId}';
+    `
+
+    let result = await db.any(SP);
+
+    return result[0].avg;
+  }
+
+  static async getFreelancerTotalProject (userId) {
+    let SP = `select 
+    count(*)
+    from 
+    public.review r
+    join 
+    public.order o
+    on
+    r.transaction_id = o.order_id
+    join
+    public.service s
+    on
+    o.service_id = s.service_id
+    join
+    public.freelancer f
+    on
+    s.freelancer_id = f.freelancer_id
+    where
+    f.user_id = '${userId}';`;
+
+    let result = await db.any(SP);
+
+    return result[0].count;
+  }
+
+  static async getProjectHistory (userId) {
+    let result = {};
+
+    result.average_rating = await this.getFreelancerAverageRating(userId);
+    result.project_amount = await this.getFreelancerTotalProject(userId);
+    result.project_list = await Order.getFreelancerProjectByUserId(userId);
+
+    console.log(result);
+
+    return result;
+  }
 }

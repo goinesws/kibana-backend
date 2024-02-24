@@ -30,6 +30,7 @@ router.get('/', async (req, res) => {
 router.post('/login', userController.loginFunction);
 router.post('/register', userController.registerFunction);
 router.post('/register-freelancer', userController.registerFreelancerFunction);
+router.post('/logout', userController.logoutFunction);
 
 // Task Related
 router.get('/api/task/new/:categoryId', taskController.getNewTaskByCategory);
@@ -59,7 +60,10 @@ router.get('/api/service/category', categoryController.getAllCategorySubcategory
 
 
 // Account Related
-router.get('/api/account/profile/:userId', clientController.getOtherProfile);
+router.get('/api/account/profile/:userId', userController.getOtherProfile);
+router.get('/api/account/my/profile', userController.getMyProfile);
+router.get('/api/account/bank-detail', userController.getMyBankDetails);
+router.get('/api/account/project/history/:userId', freelancerController.getFreelancerProjectHistory);
 router.get('/api/account/description/:userId', freelancerController.getFreelancerDescription);
 router.get('/api/account/educations/:userId', freelancerController.getFreelancerEducationHistory);
 router.get('/api/account/skills/:userId', freelancerController.getFreelancerSkill);

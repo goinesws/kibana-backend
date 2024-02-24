@@ -5,16 +5,16 @@ const crypto = require('crypto');
 module.exports = class User {
   static async getLoginInfo (username, password) {
     // SP buat get client ID
-    let clientID = username;
+    let clientID;
     if (username.includes('@')) {
-      let SPGetClientID = `select client_id from public.client where email = '${username}';`;
+      let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
       let res = await db.any(SPGetClientID);
       clientID = res[0].client_id;
       console.log(clientID);
     }
   
     // SP buat cek dari DB
-    let SP = `select client_id as username, name, profile_image as profile_image_url from public.client where client_id = '${clientID}' and password = '${password}';`;
+    let SP = `select username, name, profile_image as profile_image_url from public.client where client_id = '${clientID}' and password = '${password}';`;
     console.log(SP);
   
     var result;
@@ -50,8 +50,6 @@ module.exports = class User {
     } else {
       result[0].is_connected_bank = true;
     }
-  
-    result[0].token = crypto.randomBytes(16).toString('hex');
   
     return result[0];
   }
@@ -121,5 +119,37 @@ module.exports = class User {
     // return JSON ke controller
   
     return {freelancer: freelancer};
+  }
+
+  static async getClientID(username) {
+    let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
+    let res = await db.any(SPGetClientID);
+    
+    return res[0].client_id;
+  }
+
+  static async getMyProfile (clientID) {
+    let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientID}';`;
+
+    let result = await db.any(SP);
+
+    return result[0];
+  }
+
+  static async getBankDetails (clientID) {
+    let SP = `
+    select 
+    bank_name,
+    beneficiary_name,
+    account_number 
+    from 
+    public.bank_information
+    where
+    user_id = '${clientID}';
+    `;
+
+    let result = await db.any(SP);
+
+    return result[0];
   }
 }
