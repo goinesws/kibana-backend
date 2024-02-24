@@ -58,12 +58,12 @@ app.getServiceList = async (req, res) =>  {
   result.error_schema = {};
   result.output_schema = {services: ''};
 
-  let serviceListResult = await Service.getServiceList(req.headers);
+  let serviceListResult = await Service.getServiceList(req.body);
   let total_amount = serviceListResult.length;
   let has_next_page = true;
 
-  if(req.headers.last_id !== "") {
-    const indexOfTarget = serviceListResult.findIndex(obj => obj.id === req.headers.last_id)
+  if(req.body.last_id !== "") {
+    const indexOfTarget = serviceListResult.findIndex(obj => obj.id === req.body.last_id)
     if (indexOfTarget !== -1) {
       serviceListResult = serviceListResult.slice(indexOfTarget + 1, indexOfTarget + 13);
     } else {
@@ -76,6 +76,8 @@ app.getServiceList = async (req, res) =>  {
     if(total_amount > 8) has_next_page = true;
     else has_next_page = false;
   }
+  // console.log(req.body)
+  // console.log(serviceListResult);
 
   if (serviceListResult == "" || serviceListResult == null) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};

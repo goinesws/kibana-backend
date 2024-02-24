@@ -106,11 +106,11 @@ class Service {
         }
     }
 
-    static async getServiceList(headers) {
-        const searchText = headers['search_text'];
-        const subcategory = headers['sub_category'];
-        const budget = headers['budget'];
-        const workingTime = headers['working_time'];
+    static async getServiceList(body) {
+        const searchText = body['search_text'];
+        const subcategory = body['sub_category'];
+        const budget = body['budget'];
+        const workingTime = body['working_time'];
     
         let SP = `SELECT service_id as id, images as image_url, service.name,
         jsonb_build_object('profile_image_url', client.profile_image, 'name', client.name) as freelancer,
@@ -176,7 +176,6 @@ class Service {
           }
 
         SP += ` ORDER BY service.created_date DESC`
-    
         let result = await db.any(SP);
     
         return result;
