@@ -3,6 +3,11 @@ const app = express();
 const Service = require('../models/serviceModel.js')
 const Freelancer = require('../models/freelancerModel.js')
 const Subcategory = require('../models/subcategoryModel.js')
+var bodyParser = require('body-parser');
+var multer = require('multer');
+const axios = require('axios');
+const FormData = require('form-data');
+const path = require('path');
 
 app.getNewService = async (req, res) =>  {
   var result = {};
@@ -84,7 +89,7 @@ app.getServiceList = async (req, res) =>  {
   }
   
   res.send(result);
-}
+}  
 
 app.getServiceDetail = async (req, res) =>  {
   var result = {};
@@ -110,6 +115,39 @@ app.getServiceDetail = async (req, res) =>  {
     result.output_schema.freelancer = freelancerResult;
     result.output_schema.review = reviewResult;
 
+  }
+
+  res.send(result);
+}
+
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+app.createNewService = async (req, res) => {
+  //upload images to imgur
+  var images = [];
+
+  images.push(await Service.addServiceImage(req.files['image_1']));
+  if(req.files['image_2']) images.push(await Service.addServiceImage(req.files['image_2']));
+  if(req.files['image_3']) images.push(await Service.addServiceImage(req.files['image_3']));
+  if(req.files['image_4']) images.push(await Service.addServiceImage(req.files['image_4']));
+  if(req.files['image_5']) images.push(await Service.addServiceImage(req.files['image_5']));
+
+  images = images.map(link => link.replace(/"/g, ''));
+
+  //process data
+  var newServiceId = await Service.createNewService(images, req.body.data);
+
+  result = {};
+
+  if (newServiceId == "") {
+    result.error_schema =  {error_code: 999, error_message: "Gagal membuat service baru"};
+    result.output_schema = {};
+  } else {
+    result.error_schema =  {error_code: 200, error_message: "Sukses."};
+    result.output_schema = {};
+    result.output_schema.id = newServiceId;
   }
 
   res.send(result);

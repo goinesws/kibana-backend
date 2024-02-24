@@ -1,5 +1,12 @@
 const express = require("express");
 const db = require("../../db");
+const imgur = require("../../imgur");
+var multer = require('multer');
+const axios = require('axios');
+const FormData = require('form-data');
+const path = require('path');
+const Requirement = require('../models/requirementModel.js');
+const { v4: uuidv4 } = require('uuid');
 
 class Service {
     constructor(){}
@@ -253,7 +260,73 @@ class Service {
           throw new Error('Failed to fetch user tasks');
       }
   }
+  
+  static async createNewService (images, data_incoming) {
+    const serviceId = uuidv4();
+    const data = JSON.parse(data_incoming);
+    const name = data.name;
+    const subCategory = data.sub_category;
+    const workingTime = data.working_time;
+    const revisionCount = data.revision_count;
+    const description = data.description;
+    const price = data.price;
+    const tags = data.tags;
+    const additionalInfo = data.additional_info;
+    const freelancerId = data.freelancer_id;
+
+    // console.log(tags)
+    additionalInfo.forEach((item, index) => {
+      Requirement.createNewRequirement(item.id, serviceId, item.is_supported);
+    });
+
+    if(!name || !subCategory || !workingTime || !revisionCount || !description || !price || !tags || !additionalInfo || !freelancerId) return "";
+
+    let SP = `
+    INSERT INTO service (service_id, subcategory_id, freelancer_id, name, description, tags, price, working_time, images, revision_count, is_active, created_date)
+    VALUES
+    ('${serviceId}', '${subCategory}', '${freelancerId}', '${name}', '${description}', ARRAY['${tags.join("','")}'], ${price}, ${workingTime}, ARRAY['${images.join("','")}'], ${revisionCount}, TRUE, CURRENT_TIMESTAMP);
+    `
+
+    await db.any(SP)
+  
+    return serviceId; 
+  }
+
+  static async addServiceImage(image) {
+    var link;
+    const clientId = '33df5c9de1e057a';
+    var axios = require('axios');
+    var data = new FormData();
+    data.append('image', image[0].buffer, { filename: `test.jpg` });
+    // data.append('image', fs.createReadStream('/home/flakrim/Downloads/GHJQTpX.jpeg'));
+  
+    var config = {
+      method: 'post',
+    maxBodyLength: Infinity,
+      url: 'https://api.imgur.com/3/image',
+      headers: { 
+        'Authorization': `Client-ID ${clientId}`, 
+        ...data.getHeaders()
+      },
+      data : data
+    };
+  
+    await axios(config)
+    .then(function (response) {
+      // console.log(JSON.stringify(response.data.data.link));
+      link = JSON.stringify(response.data.data.link);
+      return response.data.data.link;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+    return link;
+  }
+
 }
+
+
 
 
 
