@@ -84,7 +84,6 @@ app.getFreelancerCV = async (req,res) => {
   res.send(result);
 }
 
-
 app.getPortfolio = async (req,res) => {
   let result = {};
   let userId = req.params.userId;
@@ -120,6 +119,26 @@ app.getOwnedService = async (req,res) => {
   } else {
     result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
     result.output_schema = owned_service;
+  }
+
+  res.send(result);
+}
+
+app.getFreelancerProjectHistory = async(req,res) => {
+  let result = {};
+  let userId = req.params.userId;
+
+  result.error_schema = {};
+  result.output_schema = {};
+
+  let projects = await Freelancer.getProjectHistory(userId);
+
+  if (projects == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema = null;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema = projects;
   }
 
   res.send(result);
