@@ -381,44 +381,39 @@ class Service {
 static async getOwnedServiceDetail(service_id) {
   try {
       var SP = `SELECT 
-      service.service_id as id,
-      service.name,
-      service.working_time,
-      service.tags,
-      service.price,
+      public.order.order_id as id,
+      public.order.status as status,
+      TO_CHAR(public.order.deadline, 'DD Mon YYYY') as due_date,
+      TO_CHAR(public.order.delivery_date, 'DD Mon YYYY') as delivery_date,
       jsonb_build_object(
-        'average_rating', (
-          SELECT AVG(rating)
-          FROM review
-          WHERE destination_id = service.service_id
-        ),
-        'rating_amount', (
-          SELECT COUNT(rating)
-          FROM review
-          WHERE destination_id = service.service_id
-        ),
-        'review_list', (
-          SELECT jsonb_agg(
-            jsonb_build_object(
-              'name', client.name,
-              'star', review.rating,
-              'description', review.content,
-              'timestamp', TO_CHAR(review.date, 'DD Mon YYYY')
-            )
+        'id', client.client_id,
+        'name', client.name,
+        'profile_image_url', client.profile_image
+      ) as client,
+      CASE 
+        WHEN public.order.status IN ('Selesai', 'Dibatalkan') THEN
+          EXISTS (
+            SELECT 1
+            FROM review
+            WHERE review.transaction_id = public.order.order_id
           )
-          FROM review
-          JOIN client ON client.client_id = review.writer_id
-          WHERE review.destination_id = service.service_id
-        )
-      ) as review,
-      (SELECT 
-         CASE
-         WHEN service.is_active = TRUE THEN 1
-         ELSE 2
-       END AS status
-      )
-    FROM service
-    WHERE service.service_id = '${service_id}'`;
+        ELSE
+          NULL
+      END as is_reviewed,
+      CASE 
+        WHEN public.order.status IN ('Selesai', 'Dibatalkan') AND
+             EXISTS (
+               SELECT 1
+               FROM review
+               WHERE review.transaction_id = public.order.order_id
+             ) THEN
+          (SELECT rating FROM review WHERE transaction_id = public.order.order_id)
+        ELSE
+          NULL
+      END as review
+    FROM public.order
+    JOIN client ON public.order.client_id = client.client_id
+    WHERE public.order.service_id = '${service_id}';`;
       const result = await db.any(SP);
       return result;
   } catch (error) {
