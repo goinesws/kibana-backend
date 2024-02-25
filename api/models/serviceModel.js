@@ -325,6 +325,48 @@ class Service {
     return link;
   }
 
+  static async getOwnedService(freelancer_id) {
+    try {
+        var SP = `select
+        service_id as id,
+        name,
+        working_time,
+        tags,
+        images as image_url,
+        price,
+        (SELECT AVG(rating)
+        FROM
+          review
+        WHERE
+        destination_id = service.service_id) as average_rating,
+        (SELECT COUNT(rating)
+        FROM 
+        review
+        WHERE 
+        destination_id = service.service_id) as rating_amount,
+        (SELECT COUNT(order_id)
+        FROM 
+          public.order
+        WHERE 
+        public.order.service_id = service.service_id
+        AND
+        status = 'Dalam Proses') as in_progress_transaction_amount,
+        (SELECT 
+           CASE
+             WHEN is_active = TRUE THEN 1
+             ELSE 2
+         END AS status
+        )
+      
+      from service
+      where freelancer_id = '${freelancer_id}'`;
+        const result = await db.any(SP);
+        return result;
+    } catch (error) {
+        throw new Error('Failed to fetch owned services');
+    }
+}
+
 }
 
 

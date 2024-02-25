@@ -163,4 +163,31 @@ app.createNewService = async (req, res) => {
   res.send(result);
 }
 
+app.getOwnedService = async (req, res) => {
+  let result = {};
+  if (req.get('X-Token') == req.session.id) {
+
+    result.error_schema = {};
+    result.output_schema = {services: ''};
+
+    const freelancer_id = req.session.freelancer_id;
+
+    const service = new Service();
+    var serviceResult = await Service.getOwnedService(freelancer_id);
+
+    if (Array.isArray(serviceResult) && serviceResult.length === 0) {
+      result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+      result.output_schema.services = serviceResult;
+    } else {
+      result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+      result.output_schema.services = serviceResult;
+    }
+    } else {
+      result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};
+      result.output_schema = null;
+    }
+
+  res.send(result);
+}
+
 module.exports = app;

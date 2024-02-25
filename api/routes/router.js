@@ -44,6 +44,7 @@ router.get('/api/service/new/:categoryId', serviceController.getNewService);
 router.get('/api/service/new', serviceController.getNewService);
 router.get('/api/service/list', serviceController.getServiceList);
 router.get('/api/service/detail/:serviceId', serviceController.getServiceDetail);
+router.get('/api/service/owned', serviceController.getOwnedService);
 
 
 
@@ -60,7 +61,6 @@ router.get('/api/service/category/:categoryId/detail', subcategoryController.get
 router.get('/api/service/:subcategoryId/additional-info', subcategoryController.getadditionalInfoBySubcategoryId);
 
 router.get('/api/service/category', categoryController.getAllCategorySubcategory);
-
 
 
 // Account Related
