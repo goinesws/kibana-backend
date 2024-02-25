@@ -45,6 +45,7 @@ router.get('/api/service/new', serviceController.getNewService);
 router.get('/api/service/list', serviceController.getServiceList);
 router.get('/api/service/detail/:serviceId', serviceController.getServiceDetail);
 router.get('/api/service/owned', serviceController.getOwnedService);
+router.get('/api/service/owned/:serviceId', serviceController.getOwnedServiceDetail);
 
 
 

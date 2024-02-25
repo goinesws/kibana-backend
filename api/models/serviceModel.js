@@ -11,6 +11,17 @@ const { v4: uuidv4 } = require('uuid');
 class Service {
     constructor(){}
 
+    static async getServiceOwner(service_id) {
+      try {
+          var SP = `select freelancer_id from service where service_id = '${service_id}'`
+          const result = await db.any(SP);
+          console.log(result[0].freelancer_id);
+          return result[0].freelancer_id;
+      } catch (error) {
+          throw new Error('Failed to fetch freelancer id');
+      }
+  }
+
     static async getNewService(category_id) {
         try {
             var SP = `SELECT service_id as id, images as image_url, service.name,
@@ -365,6 +376,54 @@ class Service {
     } catch (error) {
         throw new Error('Failed to fetch owned services');
     }
+}
+
+static async getOwnedServiceDetail(service_id) {
+  try {
+      var SP = `SELECT 
+      service.service_id as id,
+      service.name,
+      service.working_time,
+      service.tags,
+      service.price,
+      jsonb_build_object(
+        'average_rating', (
+          SELECT AVG(rating)
+          FROM review
+          WHERE destination_id = service.service_id
+        ),
+        'rating_amount', (
+          SELECT COUNT(rating)
+          FROM review
+          WHERE destination_id = service.service_id
+        ),
+        'review_list', (
+          SELECT jsonb_agg(
+            jsonb_build_object(
+              'name', client.name,
+              'star', review.rating,
+              'description', review.content,
+              'timestamp', TO_CHAR(review.date, 'DD Mon YYYY')
+            )
+          )
+          FROM review
+          JOIN client ON client.client_id = review.writer_id
+          WHERE review.destination_id = service.service_id
+        )
+      ) as review,
+      (SELECT 
+         CASE
+         WHEN service.is_active = TRUE THEN 1
+         ELSE 2
+       END AS status
+      )
+    FROM service
+    WHERE service.service_id = '${service_id}'`;
+      const result = await db.any(SP);
+      return result;
+  } catch (error) {
+      throw new Error('Failed to fetch owned services detail');
+  }
 }
 
 }
