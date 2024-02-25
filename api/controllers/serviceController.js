@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const Service = require('../models/serviceModel.js')
 const Freelancer = require('../models/freelancerModel.js')
+const User = require('../models/userModel.js')
 const Subcategory = require('../models/subcategoryModel.js')
 var bodyParser = require('body-parser');
 var multer = require('multer');
@@ -332,6 +333,36 @@ app.deleteService = async (req, res) => {
     } else {
       result.error_schema = {'error_code': 403, 'error_message': 'Not the owner of this service.'};
       result.output_schema = null;
+    }
+  } else {
+    result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};
+      result.output_schema = null;
+  }
+    
+
+  res.send(result);
+}
+
+//from client
+app.getServiceHistory = async (req, res) => {
+  let result = {};
+
+  if (req.get('X-Token') == req.session.id) {
+    result.error_schema = {};
+    result.output_schema = {service_detail: ''};
+
+    const client_id = User.getClientID(req.session.username);
+
+    const service = new Service();
+
+    var serviceResult = await Service.getClientServiceHistory(client_id);
+
+    if (Array.isArray(serviceResult) && serviceResult.length === 0) {
+      result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+      result.output_schema.service_detail = serviceResult;
+    } else {
+      result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+      result.output_schema.service_detail = serviceResult;
     }
   } else {
     result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};

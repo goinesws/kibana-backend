@@ -130,8 +130,11 @@ module.exports = class User {
   static async getClientID(username) {
     let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
     let res = await db.any(SPGetClientID);
+
+    console.log(res[0].client_id + "RESCLEU")
+    var client_id = res[0].client_id;
     
-    return res[0].client_id;
+    return client_id;
   }
 
   static async getMyProfile (clientID) {
