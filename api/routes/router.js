@@ -45,6 +45,9 @@ router.get('/api/service/new', serviceController.getNewService);
 router.get('/api/service/list', serviceController.getServiceList);
 router.get('/api/service/detail/:serviceId', serviceController.getServiceDetail);
 
+
+
+
 router.post('/api/service/create', upload.fields([
   { name: 'image_1', maxCount: 1 },
   { name: 'image_2', maxCount: 1 },
@@ -54,6 +57,7 @@ router.post('/api/service/create', upload.fields([
 ]), serviceController.createNewService);
 
 router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
+router.get('/api/service/:subcategoryId/additional-info', subcategoryController.getadditionalInfoBySubcategoryId);
 
 router.get('/api/service/category', categoryController.getAllCategorySubcategory);
 

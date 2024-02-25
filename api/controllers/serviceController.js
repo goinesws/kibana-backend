@@ -127,29 +127,37 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.createNewService = async (req, res) => {
-  //upload images to imgur
-  var images = [];
+  let result = {};
+  if (req.get('X-Token') == req.session.id) {
+    var images = [];
 
-  images.push(await Service.addServiceImage(req.files['image_1']));
-  if(req.files['image_2']) images.push(await Service.addServiceImage(req.files['image_2']));
-  if(req.files['image_3']) images.push(await Service.addServiceImage(req.files['image_3']));
-  if(req.files['image_4']) images.push(await Service.addServiceImage(req.files['image_4']));
-  if(req.files['image_5']) images.push(await Service.addServiceImage(req.files['image_5']));
+    images.push(await Service.addServiceImage(req.files['image_1']));
+    if(req.files['image_2']) images.push(await Service.addServiceImage(req.files['image_2']));
+    if(req.files['image_3']) images.push(await Service.addServiceImage(req.files['image_3']));
+    if(req.files['image_4']) images.push(await Service.addServiceImage(req.files['image_4']));
+    if(req.files['image_5']) images.push(await Service.addServiceImage(req.files['image_5']));
+  
+    images = images.map(link => link.replace(/"/g, ''));
 
-  images = images.map(link => link.replace(/"/g, ''));
+    var freelancerId = req.session.freelancer_id;
+  
+    //process data
+    var newServiceId = await Service.createNewService(images, req.body.data, freelancerId);
+  
+    result = {};
+  
+    if (newServiceId == "") {
+      result.error_schema =  {error_code: 999, error_message: "Gagal membuat service baru"};
+      result.output_schema = {};
+    } else {
+      result.error_schema =  {error_code: 200, error_message: "Sukses."};
+      result.output_schema = {};
+      result.output_schema.id = newServiceId;
+    }
 
-  //process data
-  var newServiceId = await Service.createNewService(images, req.body.data);
-
-  result = {};
-
-  if (newServiceId == "") {
-    result.error_schema =  {error_code: 999, error_message: "Gagal membuat service baru"};
-    result.output_schema = {};
   } else {
-    result.error_schema =  {error_code: 200, error_message: "Sukses."};
-    result.output_schema = {};
-    result.output_schema.id = newServiceId;
+    result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};
+    result.output_schema = null;
   }
 
   res.send(result);

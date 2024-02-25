@@ -260,7 +260,7 @@ class Service {
       }
   }
   
-  static async createNewService (images, data_incoming) {
+  static async createNewService (images, data_incoming, clientId) {
     const serviceId = uuidv4();
     const data = JSON.parse(data_incoming);
     const name = data.name;
@@ -271,7 +271,9 @@ class Service {
     const price = data.price;
     const tags = data.tags;
     const additionalInfo = data.additional_info;
-    const freelancerId = data.freelancer_id;
+    const freelancerId = clientId;
+
+    console.log(clientId)
 
     // console.log(tags)
     additionalInfo.forEach((item, index) => {
