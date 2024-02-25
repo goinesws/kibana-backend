@@ -10,6 +10,12 @@ const clientController = require('../controllers/clientController');
 const freelancerController = require('../controllers/freelancerController');
 const Subcategory = require('../models/subcategoryModel');
 
+const multer = require('multer');
+
+//storage for file uploads
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 router.get('/', async (req, res) => {
   try {
       const result = await db.any('select * from public.client');
@@ -38,12 +44,27 @@ router.get('/api/service/new/:categoryId', serviceController.getNewService);
 router.get('/api/service/new', serviceController.getNewService);
 router.get('/api/service/list', serviceController.getServiceList);
 router.get('/api/service/detail/:serviceId', serviceController.getServiceDetail);
+router.get('/api/service/owned', serviceController.getOwnedService);
+router.get('/api/service/owned/:serviceId', serviceController.getOwnedServiceDetail);
+router.get('/api/service/owned/:serviceId/orders', serviceController.getOwnedServiceOrders);
+router.put('/api/service/:serviceId/deactivate', serviceController.deactivateService);
+router.put('/api/service/:serviceId/delete', serviceController.deleteService);
 
+
+
+
+router.post('/api/service/create', upload.fields([
+  { name: 'image_1', maxCount: 1 },
+  { name: 'image_2', maxCount: 1 },
+  { name: 'image_3', maxCount: 1 },
+  { name: 'image_4', maxCount: 1 },
+  { name: 'image_5', maxCount: 1 }
+]), serviceController.createNewService);
 
 router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
+router.get('/api/service/:subcategoryId/additional-info', subcategoryController.getadditionalInfoBySubcategoryId);
 
 router.get('/api/service/category', categoryController.getAllCategorySubcategory);
-
 
 
 // Account Related

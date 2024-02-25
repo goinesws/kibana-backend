@@ -38,7 +38,13 @@ module.exports = class User {
       result[0].is_freelancer = false;
     } else {
       result[0].is_freelancer = true;
+      
+      //get freelancer ID
+      let SPFreelancerID = `select freelancer_id from freelancer where "user_id" = '${clientID}';`
+      let freelancer_id = await db.any(SPFreelancerID);
+      result[0].freelancer_id = freelancer_id[0].freelancer_id;
     }
+
   
     // SP buat cek Bank Account
     let SPBank = `select count(*) from public.bank_information where user_id = '${clientID}';`;
