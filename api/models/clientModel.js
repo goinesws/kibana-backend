@@ -1,5 +1,7 @@
 const express = require("express");
 const db = require("../../db");
+const Review = require("../models/reviewModel");
+const Task = require("../models/taskModel");
 
 module.exports = class Client {
   static async getClientByTaskID (taskId) {
@@ -24,5 +26,26 @@ module.exports = class Client {
     let result = await db.any(SPGetClientDetails);
 
     return result[0];
+  }
+
+  static async getClientReview (userId) {
+    let result = {};
+    let review = await Review.getClientReviewByUserId(userId);
+
+    let average_rating = await Review.getClientAverageRatingByUserId(userId);
+
+    let rating_amount = await Review.getClientReviewRatingAmountByUserId(userId);
+
+    result.average_rating = average_rating;
+    result.rating_amount = rating_amount;
+    result.review_list = review;
+
+    return result;
+  }
+
+  static async getClientTask (userId) {
+    let result = await Task.getTaskByClientId(userId);
+
+    return result;
   }
 }

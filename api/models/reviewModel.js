@@ -73,4 +73,68 @@ module.exports = class Review {
 
     return result[0];
   }
+
+  static async getClientReviewByUserId (userId) {
+    let SP = `select 
+    c.name,
+    r.rating as star,
+    r.content as description,
+    r.date as timestamp
+    from public.review r
+    join
+    public.freelancer f 
+    on
+    r.writer_id = f.freelancer_id
+    join
+    public.client c
+    on
+    f.user_id = c.client_id
+    where 
+    destination_id = '${userId}';`;
+
+    let result = db.any(SP);
+
+    return result;
+  }
+
+  static async getClientAverageRatingByUserId (userId) {
+    let SP = `select 
+    round(avg(r.rating), 1) as average_rating
+    from public.review r
+    join
+    public.freelancer f 
+    on
+    r.writer_id = f.freelancer_id
+    join
+    public.client c
+    on
+    f.user_id = c.client_id
+    where 
+    destination_id = '${userId}';`;
+
+    let result = await db.any(SP);
+
+    return result[0].average_rating;
+  }
+
+  static async getClientReviewRatingAmountByUserId (userId) {
+    let SP = `
+    select 
+    count(*)
+    from public.review r
+    join
+    public.freelancer f 
+    on
+    r.writer_id = f.freelancer_id
+    join
+    public.client c
+    on
+    f.user_id = c.client_id
+    where 
+    destination_id = '${userId}';`;
+
+    let result = await db.any(SP);
+
+    return result[0].count;
+  }
 }

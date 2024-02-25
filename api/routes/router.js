@@ -49,7 +49,9 @@ router.get('/api/service/category', categoryController.getAllCategorySubcategory
 // Account Related
 router.get('/api/account/profile/:userId', userController.getOtherProfile);
 router.get('/api/account/my/profile', userController.getMyProfile);
+router.get('/api/account/edit/profile', userController.editMyProfile);
 router.get('/api/account/bank-detail', userController.getMyBankDetails);
+router.get('/api/account/edit/bank-detail', userController.editBankDetails);
 router.get('/api/account/project/history/:userId', freelancerController.getFreelancerProjectHistory);
 router.get('/api/account/description/:userId', freelancerController.getFreelancerDescription);
 router.get('/api/account/educations/:userId', freelancerController.getFreelancerEducationHistory);
@@ -57,5 +59,7 @@ router.get('/api/account/skills/:userId', freelancerController.getFreelancerSkil
 router.get('/api/account/cv/:userId', freelancerController.getFreelancerCV);
 router.get('/api/account/portfolio/:userId', freelancerController.getPortfolio);
 router.get('/api/account/services/:userId', freelancerController.getOwnedService);
+router.get('/api/account/tasks/:userId', clientController.getClientTask);
+router.get('/api/account/reviews/:userId', clientController.getClientReview);
 
 module.exports = router;

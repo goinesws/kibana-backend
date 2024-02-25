@@ -134,6 +134,30 @@ module.exports = class Task {
 
     return result;
   }
+
+  static async getTaskByClientId (userId) {
+    let SP =
+    `
+    select 
+    task_id as id,
+    name,
+    description,
+    tags,
+    deadline as due_date,
+    difficulty,
+    price
+    from 
+    public.task
+    where
+    client_id = '${userId}'
+    and
+    status = '1';
+    `;
+
+    let result = await db.any(SP);
+
+    return result;
+  }
 }
 
  
