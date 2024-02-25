@@ -433,6 +433,17 @@ static async deactivateService(service_id) {
   }
 }
 
+static async deleteService(service_id) {
+  try {
+      var SP = `delete from service
+      where service_id = '${service_id}';`;
+      const result = await db.any(SP);
+      return "Successfully deleted service";
+  } catch (error) {
+      throw new Error('Failed to deactivate service');
+  }
+}
+
 }
 
 
