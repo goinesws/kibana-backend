@@ -165,4 +165,48 @@ app.getMyBankDetails = async (req,res) => {
   res.send(result);
 }
 
+app.editMyProfile = async (req,res) => {
+  // harus get session-id dari req
+  // ini pakai params dari body isiannya
+  let result = {};
+
+  result.error_schema = {};
+  result.output_schema = {};
+
+  console.log(req.session.id);
+  console.log(req.get("X-Token"));
+
+  if (req.session.id == req.get("X-Token")) {
+    
+  } else {
+    result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};
+    result.output_schema = null;
+  }
+
+  res.send(result);
+}
+
+app.editBankDetails = async (req,res) => {
+  // harus get session-id buat cocokin 
+  // ini pakai params dari body isiannya
+  let result = {};
+
+  result.error_schema = {};
+  result.output_schema = {};
+
+  console.log(req.session.id);
+  console.log(req.get("X-Token"));
+
+  if (req.session.id == req.get("X-Token")) {
+
+  } else {
+    result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};
+    result.output_schema = null;
+  }
+
+  res.send(result);
+}
+
+
+
 module.exports = app;

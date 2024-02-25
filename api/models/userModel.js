@@ -161,4 +161,12 @@ module.exports = class User {
 
     return result[0];
   }
+
+  static async editMyprofile () {
+
+  }
+
+  static async editBankDetails (clientID, body) {
+    
+  }
 }
