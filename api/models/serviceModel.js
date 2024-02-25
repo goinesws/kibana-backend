@@ -421,6 +421,18 @@ static async getOwnedServiceDetail(service_id) {
   }
 }
 
+static async deactivateService(service_id) {
+  try {
+      var SP = `update service
+      set is_active = FALSE
+      where service_id = '${service_id}';`;
+      const result = await db.any(SP);
+      return "Successfully deactivated service";
+  } catch (error) {
+      throw new Error('Failed to deactivate service');
+  }
+}
+
 }
 
 

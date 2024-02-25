@@ -268,4 +268,41 @@ app.getOwnedServiceOrders = async (req, res) => {
   res.send(result);
 }
 
+app.deactivateService = async (req, res) => {
+  let result = {};
+
+  if (req.get('X-Token') == req.session.id) {
+
+    result.error_schema = {};
+    result.output_schema = {transactions: ''};
+
+    const freelancer_id = req.session.freelancer_id;
+    const service_id = req.params.serviceId;
+
+    const service = new Service();
+    var serviceOwner = await Service.getServiceOwner(service_id);
+
+    if (serviceOwner == freelancer_id) {
+      var serviceResult = await Service.deactivateService(service_id);
+
+      if (serviceResult == null) {
+        result.error_schema = {'error_code': 903, 'error_message': 'Deactivate gagal.'};
+        result.output_schema.transactions = serviceResult;
+      } else {
+        result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+        result.output_schema.transactions = serviceResult;
+      }
+      } else {
+        result.error_schema = {'error_code': 403, 'error_message': 'Not the owner of this service.'};
+        result.output_schema = null;
+      }
+    } else {
+      result.error_schema = {'error_code': 403, 'error_message': 'Forbidden.'};
+        result.output_schema = null;
+    }
+    
+
+  res.send(result);
+}
+
 module.exports = app;

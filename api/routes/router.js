@@ -47,6 +47,7 @@ router.get('/api/service/detail/:serviceId', serviceController.getServiceDetail)
 router.get('/api/service/owned', serviceController.getOwnedService);
 router.get('/api/service/owned/:serviceId', serviceController.getOwnedServiceDetail);
 router.get('/api/service/owned/:serviceId/orders', serviceController.getOwnedServiceOrders);
+router.put('/api/service/:serviceId/deactivate', serviceController.deactivateService);
 
 
 
