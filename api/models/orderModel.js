@@ -3,8 +3,7 @@ const db = require("../../db");
 
 module.exports = class Order {
   static async getFreelancerProjectByUserId(userId) {
-    let SP = 
-    `
+    let SP = `
     select 
     s.name as project_name,
     r.rating as star,
@@ -32,4 +31,4 @@ module.exports = class Order {
 
     return result;
   }
-}
+};

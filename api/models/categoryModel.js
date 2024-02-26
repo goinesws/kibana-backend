@@ -2,7 +2,7 @@ const express = require("express");
 const db = require("../../db");
 
 module.exports = class Category {
-  static async getAllCategoriesForTask () {
+  static async getAllCategoriesForTask() {
     let SPGetCategories = `select category_id as id, name, image from public.category`;
 
     let result = await db.any(SPGetCategories);
@@ -10,7 +10,7 @@ module.exports = class Category {
     return result;
   }
 
-  static async getAllCategorySubcategory () {
+  static async getAllCategorySubcategory() {
     let SPGetCategories = `
     select category.category_id as id, category.name as name, category.image as image_url, 
         COALESCE(
@@ -37,4 +37,4 @@ module.exports = class Category {
 
     return result;
   }
-}
+};

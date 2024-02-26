@@ -4,8 +4,8 @@ const Review = require("../models/reviewModel");
 const Task = require("../models/taskModel");
 
 module.exports = class Client {
-  static async getClientByTaskID (taskId) {
-    // SP buat get Client Details 
+  static async getClientByTaskID(taskId) {
+    // SP buat get Client Details
     let SPGetClient = `select public.client.client_id as id, profile_image as profile_image_url, public.client.name from public.client 
     join 
     public.task 
@@ -19,22 +19,24 @@ module.exports = class Client {
     return result[0];
   }
 
-  static async getOtherClientProfile (userId) {
+  static async getOtherClientProfile(userId) {
     let SPGetClientDetails = `select client_id as id, profile_image as profile_image_url, name, username from public.client 
-    where client_id = '${userId}'; `
+    where client_id = '${userId}'; `;
 
     let result = await db.any(SPGetClientDetails);
 
     return result[0];
   }
 
-  static async getClientReview (userId) {
+  static async getClientReview(userId) {
     let result = {};
     let review = await Review.getClientReviewByUserId(userId);
 
     let average_rating = await Review.getClientAverageRatingByUserId(userId);
 
-    let rating_amount = await Review.getClientReviewRatingAmountByUserId(userId);
+    let rating_amount = await Review.getClientReviewRatingAmountByUserId(
+      userId
+    );
 
     result.average_rating = average_rating;
     result.rating_amount = rating_amount;
@@ -43,9 +45,9 @@ module.exports = class Client {
     return result;
   }
 
-  static async getClientTask (userId) {
+  static async getClientTask(userId) {
     let result = await Task.getTaskByClientId(userId);
 
     return result;
   }
-}
+};
