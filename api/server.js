@@ -15,7 +15,7 @@ app.use(session
     return uuidv4() 
   },
   secret: 'kibana',   
-  resave: false, 
+  resave: true, 
   saveUninitialized: true, 
   cookie: { maxAge: 86400 },
   }));

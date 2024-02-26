@@ -212,13 +212,23 @@ app.editBankDetails = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {};
 
-  console.log(req.session.id);
-  console.log(req.get("X-Token"));
+  // console.log(req.session.id);
+  // console.log(req.get("X-Token"));
 
   if (req.session.id == req.get("X-Token")) {
+    // console.log(req.body);
+    try {
+      let change = await User.editBankDetails(req.session.client_id, req.body);
+      result.error_schema = { error_code: 200, error_message: "Success." };
+      result.output_schema = {};
+    } catch {
+      result.error_schema = { error_code: 999, error_message: "Gagal." };
+      result.output_schema = {};
+    }
+
   } else {
     result.error_schema = { error_code: 403, error_message: "Forbidden." };
-    result.output_schema = null;
+    result.output_schema = {};
   }
 
   res.send(result);

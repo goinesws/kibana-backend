@@ -21,4 +21,25 @@ app.getAllCategorySubcategory = async (req, res) =>  {
     res.send(result);
   }
 
+app.getAllCategorySubcategoryTask = async (req, res) => {
+  var result = {};
+
+  result.error_schema = {};
+  result.output_schema = {categories: ''};
+
+  let category = await Category.getAllCategorySubcategoryTask();
+
+  // console.log(taskResult);
+
+  if (category == null) {
+    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
+    result.output_schema.categories = category;
+  } else {
+    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
+    result.output_schema.categories = category;
+  }
+
+  res.send(result);
+}
+
 module.exports = app;

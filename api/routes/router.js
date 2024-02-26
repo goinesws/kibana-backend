@@ -34,8 +34,8 @@ router.post('/logout', userController.logoutFunction);
 
 // Task Related
 router.get('/api/task/new/:categoryId', taskController.getNewTaskByCategory);
-router.get('/api/task/category/:categoryId/detail', taskController.getTaskCategoryDetail);
-router.get('/api/task/category', taskController.getTaskCategories);
+router.get('/api/task/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
+router.get('/api/task/category', categoryController.getAllCategorySubcategoryTask);
 router.post('/api/task/list', taskController.getTaskList);
 router.get('/api/task/detail/:taskId', taskController.getTaskDetails);
 
@@ -50,10 +50,6 @@ router.get('/api/service/owned/:serviceId/orders', serviceController.getOwnedSer
 router.put('/api/service/:serviceId/deactivate', serviceController.deactivateService);
 router.put('/api/service/:serviceId/delete', serviceController.deleteService);
 router.get('/api/service/history', serviceController.getServiceHistory);
-
-
-
-
 router.post('/api/service/create', upload.fields([
   { name: 'image_1', maxCount: 1 },
   { name: 'image_2', maxCount: 1 },
@@ -61,10 +57,8 @@ router.post('/api/service/create', upload.fields([
   { name: 'image_4', maxCount: 1 },
   { name: 'image_5', maxCount: 1 }
 ]), serviceController.createNewService);
-
 router.get('/api/service/category/:categoryId/detail', subcategoryController.getSubcategoryByCategory);
 router.get('/api/service/:subcategoryId/additional-info', subcategoryController.getadditionalInfoBySubcategoryId);
-
 router.get('/api/service/category', categoryController.getAllCategorySubcategory);
 
 

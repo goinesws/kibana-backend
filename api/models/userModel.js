@@ -171,11 +171,21 @@ module.exports = class User {
   static async editMyprofile(clientId) {}
 
   static async editBankDetails(clientId, body) {
-    let SP = `UPDATE public.bankInformation 
-    set 
+    let SP = `
+    UPDATE
+    public.bank_information
+    set
     bank_name = '${body.bank_name}',
     beneficiary_name = '${body.beneficiary_name}',
     account_number = '${body.account_number}'
-    where userId = clientId`;
+    where 
+    user_id = '${clientId}';`;
+
+    let res = await db.any(SP);
+
+    // console.log('--RES--');
+    // console.log(res);
+
+    return res;
   }
 };

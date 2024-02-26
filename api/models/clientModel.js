@@ -16,6 +16,9 @@ module.exports = class Client {
 
     let result = await db.any(SPGetClient);
 
+    console.log('Hasil : ');
+    console.log(result);
+
     return result[0];
   }
 

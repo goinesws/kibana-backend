@@ -1,5 +1,6 @@
 const express = require("express");
 const db = require("../../db");
+const Subcategory = require('../models/subcategoryModel')
 
 module.exports = class Category {
   static async getAllCategoriesForTask() {
@@ -34,6 +35,34 @@ module.exports = class Category {
       ORDER BY id asc`;
 
     let result = await db.any(SPGetCategories);
+
+    return result;
+  }
+
+  static async getAllCategorySubcategoryTask() {
+    let result = await Category.getAllCategoriesForTask();
+    // console.log(result);
+    if (result.length == 0) {
+      return null;
+    }
+    // get subcategories
+    // get all the subcategories for each category
+    for (let i = 0; i < result.length; i++) {
+      let subcatResult = await Subcategory.getSubcatLiteByCategoryID(result[i].id);
+
+      // console.log('Subcat Result');
+      // console.log(subcatResult);
+      // get amount based on subcat
+      let count = 0;
+      for (let j = 0; j < subcatResult.length; j++) {       
+        let countResult = await Subcategory.getSubcatCountByID(subcatResult[j].id);
+        // console.log('Count Result di Task Model');
+        // console.log(countResult.count);
+        count +=  parseInt(countResult.count);
+      }
+      result[i].task_amount = count;
+      result[i].sub_categories = subcatResult;
+    }
 
     return result;
   }

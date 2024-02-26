@@ -2,10 +2,8 @@ const express = require("express");
 const db = require("../../db");
 const Subcategory = require("../models/subcategoryModel");
 const Category = require("../models/categoryModel");
-const Client = require("../models/clientModel");
 const Freelancer = require("../models/freelancerModel");
 const Review = require("../models/reviewModel");
-const { search } = require("../controllers/userController");
 
 module.exports = class Task {
   static async getTaskList(headers) {
@@ -114,7 +112,15 @@ module.exports = class Task {
 
     result.task_detail = temp_task_detail[0];
 
-    let temp_client = await Client.getClientByTaskID(taskId);
+    let SPGetClient = `select public.client.client_id as id, profile_image as profile_image_url, public.client.name from public.client 
+    join 
+    public.task 
+    on
+    public.client.client_id = public.task.client_id
+    and
+    public.task.task_id = '${taskId}';`;
+
+    let temp_client = await db.any(SPGetClient);
 
     result.client = temp_client;
 
@@ -131,6 +137,8 @@ module.exports = class Task {
     result.review.average_rating = temp_res_get_client_avg_rating.average_rating;
     result.review.rating_amount = temp_res_get_client_review_rating_amount.rating_amount;
     result.review.review_list = temp_res_get_client_client_review_list;
+
+    console.log(result);
 
     return result;
   }
