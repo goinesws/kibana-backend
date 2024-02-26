@@ -143,15 +143,15 @@ module.exports = class User {
     return client_id;
   }
 
-  static async getMyProfile(clientID) {
-    let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientID}';`;
+  static async getMyProfile(clientId) {
+    let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
 
     let result = await db.any(SP);
 
     return result[0];
   }
 
-  static async getBankDetails(clientID) {
+  static async getBankDetails(clientId) {
     let SP = `
     select 
     bank_name,
@@ -160,7 +160,7 @@ module.exports = class User {
     from 
     public.bank_information
     where
-    user_id = '${clientID}';
+    user_id = '${clientId}';
     `;
 
     let result = await db.any(SP);
@@ -168,7 +168,14 @@ module.exports = class User {
     return result[0];
   }
 
-  static async editMyprofile() {}
+  static async editMyprofile(clientId) {}
 
-  static async editBankDetails(clientID, body) {}
+  static async editBankDetails(clientId, body) {
+    let SP = `UPDATE public.bankInformation 
+    set 
+    bank_name = '${body.bank_name}',
+    beneficiary_name = '${body.beneficiary_name}',
+    account_number = '${body.account_number}'
+    where userId = clientId`;
+  }
 };
