@@ -3,7 +3,7 @@ const db = require("../../db");
 const crypto = require("crypto");
 
 module.exports = class User {
-  static async getLoginInfo(username, password) {
+  async getLoginInfo(username, password) {
     // SP buat get client ID
     let clientID;
     if (username.includes("@")) {
@@ -59,7 +59,7 @@ module.exports = class User {
     return result[0];
   }
 
-  static async registerAsClient(email, username, name, phone, password) {
+  async registerAsClient(email, username, name, phone, password) {
     // Insert ke DB
     let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`;
     console.log(SP);
@@ -89,7 +89,7 @@ module.exports = class User {
     return result;
   }
 
-  static async registerAsFreelancer(freelancer, username) {
+  async registerAsFreelancer(freelancer, username) {
     // cek dlu udah ada di client blm
     let checkerSP = `select count(*) from public.client where client_id ='${username}';`;
 
@@ -133,7 +133,7 @@ module.exports = class User {
     return { freelancer: freelancer };
   }
 
-  static async getClientID(username) {
+  async getClientID(username) {
     let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
     let res = await db.any(SPGetClientID);
 
@@ -143,7 +143,7 @@ module.exports = class User {
     return client_id;
   }
 
-  static async getMyProfile(clientId) {
+  async getMyProfile(clientId) {
     let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
 
     let result = await db.any(SP);
@@ -151,7 +151,7 @@ module.exports = class User {
     return result[0];
   }
 
-  static async getBankDetails(clientId) {
+  async getBankDetails(clientId) {
     let SP = `
     select 
     bank_name,
@@ -168,9 +168,9 @@ module.exports = class User {
     return result[0];
   }
 
-  static async editMyprofile(clientId) {}
+  async editMyprofile(clientId) {}
 
-  static async editBankDetails(clientId, body) {
+  async editBankDetails(clientId, body) {
     let SP = `
     UPDATE
     public.bank_information

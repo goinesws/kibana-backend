@@ -11,8 +11,8 @@ app.getSubcategoryByCategory = async (req, res) =>  {
 
   const category_id = req.params.categoryId;
 
-  const subcat = new Subcategory();
-  var subcatResult = await Subcategory.getSubcatByCategoryID(category_id);
+  const subcatInstance = new Subcategory();
+  var subcatResult = await subcatInstance.getSubcatByCategoryID(category_id);
 
   if (Array.isArray(subcatResult) && subcatResult.length === 0) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -35,8 +35,8 @@ app.getadditionalInfoBySubcategoryId = async (req, res) =>  {
   let subcatResult;
 
   if (req.get('X-Token') == req.session.id) {
-    const subcat = new Subcategory();
-    subcatResult = await Subcategory.getadditionalInfoBySubcategoryId(subcategory_id);
+    const subcatInstance = new Subcategory();
+    subcatResult = await subcatInstance.getadditionalInfoBySubcategoryId(subcategory_id);
     if (subcatResult == null) {
       result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
       result.output_schema = null;

@@ -9,7 +9,8 @@ app.getNewTaskByCategory = async (req, res) =>  {
   result.error_schema = {};
   result.output_schema = {tasks: ''};
 
-  let taskResult = await Task.getNewTaskByCategory(req.params.categoryId);
+  const taskInstance = new Task();
+  let taskResult = await taskInstance.getNewTaskByCategory(req.params.categoryId);
 
   // console.log(taskResult);
 
@@ -30,7 +31,8 @@ app.getTaskDetails = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {};
 
-  let taskDetailResult = await Task.getTaskDetails(req.params.taskId);
+  const taskInstance = new Task();
+  let taskDetailResult = await taskInstance.getTaskDetails(req.params.taskId);
 
   // console.log(taskDetailResult);
 
@@ -51,7 +53,8 @@ app.getTaskList = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {};
 
-  let taskListResult = await Task.getTaskList(req.headers);
+  const taskInstance = new Task();
+  let taskListResult = await taskInstance.getTaskList(req.headers);
   let total_amount = taskListResult.length;
   let has_next_page = true;
 

@@ -4,7 +4,7 @@ const Review = require("../models/reviewModel");
 const Task = require("../models/taskModel");
 
 module.exports = class Client {
-  static async getClientByTaskID(taskId) {
+  async getClientByTaskID(taskId) {
     // SP buat get Client Details
     let SPGetClient = `select public.client.client_id as id, profile_image as profile_image_url, public.client.name from public.client 
     join 
@@ -22,7 +22,7 @@ module.exports = class Client {
     return result[0];
   }
 
-  static async getOtherClientProfile(userId) {
+  async getOtherClientProfile(userId) {
     let SPGetClientDetails = `select client_id as id, profile_image as profile_image_url, name, username from public.client 
     where client_id = '${userId}'; `;
 
@@ -48,7 +48,7 @@ module.exports = class Client {
     return result;
   }
 
-  static async getClientTask(userId) {
+  async getClientTask(userId) {
     let result = await Task.getTaskByClientId(userId);
 
     return result;

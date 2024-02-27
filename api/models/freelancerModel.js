@@ -3,7 +3,7 @@ const db = require("../../db");
 const Order = require("../models/orderModel");
 
 module.exports = class Freelancer {
-  static async getFreelancerByTaskID(taskId) {
+  async getFreelancerByTaskID(taskId) {
     let SPGetRegisteredFreelancer = `select public.freelancer.freelancer_id as id, public.client.profile_image as profile_image_url, public.client.name
     from 
     public.client
@@ -27,7 +27,7 @@ module.exports = class Freelancer {
     return result;
   }
 
-  static async isFreelancer (userId) {
+  async isFreelancer (userId) {
     let SPGetIsFreelancer = `select count(*) from public.freelancer where user_id = '${userId}';`
 
     let result = await db.any(SPGetIsFreelancer);
@@ -39,7 +39,7 @@ module.exports = class Freelancer {
     }
   }
 
-  static async getDesc (userId) {
+  async getDesc (userId) {
     let SP = `select description from public.freelancer where user_id='${userId}'`;
 
     let result = await db.any(SP);
@@ -47,7 +47,7 @@ module.exports = class Freelancer {
     return result[0];
   }
 
-  static async getEducationHistory (userId) {
+  async getEducationHistory (userId) {
     let SP = `
     select degree, major, university, country, year as graduation_year from public.education p
     join
@@ -63,7 +63,7 @@ module.exports = class Freelancer {
     return result;
   }
 
-  static async getSkill (userId) {
+  async getSkill (userId) {
     let SP = `select skills from public.freelancer where user_id = '${userId}';`
 
     console.log(SP);
@@ -73,7 +73,7 @@ module.exports = class Freelancer {
     return result[0].skills;
   }
 
-  static async getCV (userId) {
+  async getCV (userId) {
     let SP = `
     select cv as cv_url from public.freelancer where user_id = '${userId}';
     `;
@@ -83,7 +83,7 @@ module.exports = class Freelancer {
     return result[0];
   }
 
-  static async getPortfolio (userId) {
+  async getPortfolio (userId) {
     let SP = `
     select portfolio as portfolio_url from public.freelancer where user_id = '${userId}';
     `;
@@ -94,7 +94,7 @@ module.exports = class Freelancer {
     return result[0];
   }
 
-  static async getOwnedService (userId) {
+  async getOwnedService (userId) {
     let SPGetService = `select s.service_id as id, s.images as image_url, s.name, s.tags, s.price, s.working_time from public.service s 
     join 
     public.freelancer f 
@@ -127,7 +127,7 @@ module.exports = class Freelancer {
     return result;
   }
 
-  static async getFreelancerByServiceId(serviceId) {
+  async getFreelancerByServiceId(serviceId) {
     let SPGetRegisteredFreelancer = `select public.freelancer.freelancer_id as id, public.client.profile_image as profile_image_url, public.client.name, freelancer.description
     from 
     public.client
@@ -146,7 +146,7 @@ module.exports = class Freelancer {
   }
 
 
-  static async getFreelancerAverageRating (userId) {
+  async getFreelancerAverageRating (userId) {
     let SP = `
     select 
     avg(r.rating)
@@ -173,7 +173,7 @@ module.exports = class Freelancer {
     return result[0].avg;
   }
 
-  static async getFreelancerTotalProject (userId) {
+  async getFreelancerTotalProject (userId) {
     let SP = `select 
     count(*)
     from 
@@ -198,7 +198,7 @@ module.exports = class Freelancer {
     return result[0].count;
   }
 
-  static async getProjectHistory (userId) {
+  async getProjectHistory (userId) {
     let result = {};
 
     result.average_rating = await this.getFreelancerAverageRating(userId);

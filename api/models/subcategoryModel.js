@@ -2,7 +2,7 @@ const express = require("express");
 const db = require("../../db");
 
 module.exports = class Subcategory {
-  static async getListSubcatByCategoryID (categoryId) {
+  async getListSubcatByCategoryID (categoryId) {
     let SPGetSubcat = `select subcategory_id from public.subcategory where category_id = '${categoryId}';`;
 
     let result = await db.any(SPGetSubcat);
@@ -30,7 +30,7 @@ module.exports = class Subcategory {
     return list;
   }
 
-  static async getSubcatByCategoryID (categoryId) {
+  async getSubcatByCategoryID (categoryId) {
     let SPGetCategories = `select subcategory_id as id, name, description as desc, image as image_url from subcategory where category_id = '${categoryId}'`;
 
     let result = await db.any(SPGetCategories);
@@ -38,7 +38,7 @@ module.exports = class Subcategory {
     return result;
   }
 
-  static async getSubcatLiteByCategoryID (categoryId) {
+  async getSubcatLiteByCategoryID (categoryId) {
     let spGetSubcategories = `select subcategory_id as id, name from public.subcategory where category_id ='${categoryId}'`;
 
     let result = {};
@@ -48,7 +48,7 @@ module.exports = class Subcategory {
     return result;
   }
 
-  static async getSubcatCountByID(subcategoryId) {
+  async getSubcatCountByID(subcategoryId) {
     let spGetCount = `select count(*) from public.task where sub_category_id = '${subcategoryId}'`;
 
     var countResult ={};
@@ -58,7 +58,7 @@ module.exports = class Subcategory {
     return countResult[0];
   }
 
-  static async getadditionalInfoBySubcategoryId(subcategoryId) {
+  async getadditionalInfoBySubcategoryId(subcategoryId) {
     let SP = `SELECT
         additionalInfo.additional_info_id as id,
         additionalInfo.question as title

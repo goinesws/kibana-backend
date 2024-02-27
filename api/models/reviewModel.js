@@ -2,7 +2,7 @@ const express = require("express");
 const db = require("../../db");
 
 module.exports = class Review {
-  static async getClientReviewByTaskID (taskId) {
+  async getClientReviewByTaskID (taskId) {
     let SPGetClientReviewList = `select public.client.name as name, rating as star, content as description, to_char(date, 'DD Month YYYY') as timestamp
     from 
     public.review
@@ -26,7 +26,7 @@ module.exports = class Review {
     return result;
   }
 
-  static async getClientReviewRatingAmountByTaskID (taskId) {
+  async getClientReviewRatingAmountByTaskID (taskId) {
     let SPGetClientReviewRatingAmount = `select count(*) as rating_amount 
     from 
     public.review
@@ -50,7 +50,7 @@ module.exports = class Review {
     return result[0];
   }
 
-  static async getClientAvgRatingByTaskID (taskId) {
+  async getClientAvgRatingByTaskID (taskId) {
     let SPGetClientAverageRating = `select round(avg(public.review.rating), 1) as average_rating
     from 
     public.review
@@ -74,7 +74,7 @@ module.exports = class Review {
     return result[0];
   }
 
-  static async getClientReviewByUserId (userId) {
+  async getClientReviewByUserId (userId) {
     let SP = `select 
     c.name,
     r.rating as star,
@@ -97,7 +97,7 @@ module.exports = class Review {
     return result;
   }
 
-  static async getClientAverageRatingByUserId (userId) {
+  async getClientAverageRatingByUserId (userId) {
     let SP = `select 
     round(avg(r.rating), 1) as average_rating
     from public.review r
@@ -117,7 +117,7 @@ module.exports = class Review {
     return result[0].average_rating;
   }
 
-  static async getClientReviewRatingAmountByUserId (userId) {
+  async getClientReviewRatingAmountByUserId (userId) {
     let SP = `
     select 
     count(*)
