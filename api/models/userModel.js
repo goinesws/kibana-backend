@@ -1,158 +1,161 @@
 const express = require("express");
 const db = require("../../db");
 const crypto = require("crypto");
+const Review = require("../models/reviewModel");
 
-module.exports = class User {
-  static async getLoginInfo(username, password) {
-    // SP buat get client ID
-    let clientID;
-    if (username.includes("@")) {
-      let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
-      let res = await db.any(SPGetClientID);
-      clientID = res[0].client_id;
-      console.log(clientID);
-    }
+class User {
+	constructor() {}
 
-    // SP buat cek dari DB
-    let SP = `select username, name, profile_image as profile_image_url from public.client where client_id = '${clientID}' and password = '${password}';`;
-    console.log(SP);
+	static async getLoginInfo(username, password) {
+		// SP buat get client ID
+		let clientID;
+		if (username.includes("@")) {
+			let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
+			let res = await db.any(SPGetClientID);
+			clientID = res[0].client_id;
+			console.log(clientID);
+		}
 
-    var result;
-    try {
-      result = await db.any(SP);
-    } catch {
-      result = null;
-    }
+		// SP buat cek dari DB
+		let SP = `select username, name, profile_image as profile_image_url from public.client where client_id = '${clientID}' and password = '${password}';`;
+		console.log(SP);
 
-    if (result == null || result[0] == undefined) return result[0];
+		var result;
+		try {
+			result = await db.any(SP);
+		} catch {
+			result = null;
+		}
 
-    // SP buat cek status
-    let SPStatus = `select count(*) as status from public.freelancer where "user_id" = '${clientID}';`;
+		if (result == null || result[0] == undefined) return result[0];
 
-    var status = await db.any(SPStatus);
+		// SP buat cek status
+		let SPStatus = `select count(*) as status from public.freelancer where "user_id" = '${clientID}';`;
 
-    console.log(result);
-    console.log(result[0]);
+		var status = await db.any(SPStatus);
 
-    if (status == 0) {
-      result[0].is_freelancer = false;
-    } else {
-      result[0].is_freelancer = true;
+		console.log(result);
+		console.log(result[0]);
 
-      //get freelancer ID
-      let SPFreelancerID = `select freelancer_id from freelancer where "user_id" = '${clientID}';`;
-      let freelancer_id = await db.any(SPFreelancerID);
-      result[0].freelancer_id = freelancer_id[0].freelancer_id;
-    }
+		if (status == 0) {
+			result[0].is_freelancer = false;
+		} else {
+			result[0].is_freelancer = true;
 
-    // SP buat cek Bank Account
-    let SPBank = `select count(*) from public.bank_information where user_id = '${clientID}';`;
+			//get freelancer ID
+			let SPFreelancerID = `select freelancer_id from freelancer where "user_id" = '${clientID}';`;
+			let freelancer_id = await db.any(SPFreelancerID);
+			result[0].freelancer_id = freelancer_id[0].freelancer_id;
+		}
 
-    var bank = await db.any(SPBank);
+		// SP buat cek Bank Account
+		let SPBank = `select count(*) from public.bank_information where user_id = '${clientID}';`;
 
-    if (bank == 0) {
-      result[0].is_connected_bank = false;
-    } else {
-      result[0].is_connected_bank = true;
-    }
+		var bank = await db.any(SPBank);
 
-    return result[0];
-  }
+		if (bank == 0) {
+			result[0].is_connected_bank = false;
+		} else {
+			result[0].is_connected_bank = true;
+		}
 
-  static async registerAsClient(email, username, name, phone, password) {
-    // Insert ke DB
-    let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`;
-    console.log(SP);
+		return result[0];
+	}
 
-    var result;
-    try {
-      result = await db.any(SP);
-    } catch {
-      result = null;
-    }
+	static async registerAsClient(email, username, name, phone, password) {
+		// Insert ke DB
+		let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`;
+		console.log(SP);
 
-    console.log(result);
+		var result;
+		try {
+			result = await db.any(SP);
+		} catch {
+			result = null;
+		}
 
-    if (result == null) return result;
+		console.log(result);
 
-    // return JSON ke controller
-    var result;
-    result = {
-      is_freelancer: false,
-      is_connected_bank: false,
-      profile_image_url: "",
-      username: username,
-      name: name,
-      token: crypto.randomBytes(16).toString("hex")
-    };
+		if (result == null) return result;
 
-    return result;
-  }
+		// return JSON ke controller
+		var result;
+		result = {
+			is_freelancer: false,
+			is_connected_bank: false,
+			profile_image_url: "",
+			username: username,
+			name: name,
+			token: crypto.randomBytes(16).toString("hex"),
+		};
 
-  static async registerAsFreelancer(freelancer, username) {
-    // cek dlu udah ada di client blm
-    let checkerSP = `select count(*) from public.client where client_id ='${username}';`;
+		return result;
+	}
 
-    var checkerResult;
-    try {
-      checkerResult = await db.any(checkerSP);
-    } catch {
-      checkerResult = null;
-    }
+	static async registerAsFreelancer(freelancer, username) {
+		// cek dlu udah ada di client blm
+		let checkerSP = `select count(*) from public.client where client_id ='${username}';`;
 
-    console.log(checkerResult);
-    if (checkerResult == null || checkerResult[0].count != 1) return null;
+		var checkerResult;
+		try {
+			checkerResult = await db.any(checkerSP);
+		} catch {
+			checkerResult = null;
+		}
 
-    // check apakah dia pernah daftar engga sbg freelancer
-    let checkerSP2 = `select count(*) from public.freelancer where user_id ='${username}';`;
+		console.log(checkerResult);
+		if (checkerResult == null || checkerResult[0].count != 1) return null;
 
-    var checkerResult2;
-    try {
-      checkerResult2 = await db.any(checkerSP2);
-    } catch {
-      checkerResult2 = null;
-    }
+		// check apakah dia pernah daftar engga sbg freelancer
+		let checkerSP2 = `select count(*) from public.freelancer where user_id ='${username}';`;
 
-    console.log(checkerResult2);
-    if (checkerResult2 == null || checkerResult2[0].count == 1) return null;
+		var checkerResult2;
+		try {
+			checkerResult2 = await db.any(checkerSP2);
+		} catch {
+			checkerResult2 = null;
+		}
 
-    // berarti sudah ada user tapi blm freelancer
-    let insertSP = `insert into public.freelancer(freelancer_id, user_id) values ('${freelancer}', '${username}')`;
+		console.log(checkerResult2);
+		if (checkerResult2 == null || checkerResult2[0].count == 1) return null;
 
-    var insertResult;
-    try {
-      insertResult = await db.any(insertSP);
-    } catch {
-      insertResult = null;
-    }
+		// berarti sudah ada user tapi blm freelancer
+		let insertSP = `insert into public.freelancer(freelancer_id, user_id) values ('${freelancer}', '${username}')`;
 
-    if (insertResult == null) return null;
+		var insertResult;
+		try {
+			insertResult = await db.any(insertSP);
+		} catch {
+			insertResult = null;
+		}
 
-    // return JSON ke controller
+		if (insertResult == null) return null;
 
-    return { freelancer: freelancer };
-  }
+		// return JSON ke controller
 
-  static async getClientID(username) {
-    let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
-    let res = await db.any(SPGetClientID);
+		return { freelancer: freelancer };
+	}
 
-    console.log(res[0].client_id + "RESCLEU");
-    var client_id = res[0].client_id;
+	static async getClientID(username) {
+		let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
+		let res = await db.any(SPGetClientID);
 
-    return client_id;
-  }
+		console.log(res[0].client_id + "RESCLEU");
+		var client_id = res[0].client_id;
 
-  static async getMyProfile(clientId) {
-    let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
+		return client_id;
+	}
 
-    let result = await db.any(SP);
+	static async getMyProfile(clientId) {
+		let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
 
-    return result[0];
-  }
+		let result = await db.any(SP);
 
-  static async getBankDetails(clientId) {
-    let SP = `
+		return result[0];
+	}
+
+	static async getBankDetails(clientId) {
+		let SP = `
     select 
     bank_name,
     beneficiary_name,
@@ -163,15 +166,15 @@ module.exports = class User {
     user_id = '${clientId}';
     `;
 
-    let result = await db.any(SP);
+		let result = await db.any(SP);
 
-    return result[0];
-  }
+		return result[0];
+	}
 
-  static async editMyprofile(clientId) {}
+	static async editMyprofile(clientId) {}
 
-  static async editBankDetails(clientId, body) {
-    let SP = `
+	static async editBankDetails(clientId, body) {
+		let SP = `
     UPDATE
     public.bank_information
     set
@@ -181,11 +184,13 @@ module.exports = class User {
     where 
     user_id = '${clientId}';`;
 
-    let res = await db.any(SP);
+		let res = await db.any(SP);
 
-    // console.log('--RES--');
-    // console.log(res);
+		// console.log('--RES--');
+		// console.log(res);
 
-    return res;
-  }
-};
+		return res;
+	}
+}
+
+module.exports = User;
