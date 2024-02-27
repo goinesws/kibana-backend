@@ -3,7 +3,7 @@ const db = require("../../db");
 const Subcategory = require('../models/subcategoryModel')
 
 module.exports = class Category {
-  static async getAllCategoriesForTask() {
+  async getAllCategoriesForTask() {
     let SPGetCategories = `select category_id as id, name, image from public.category`;
 
     let result = await db.any(SPGetCategories);
@@ -11,7 +11,7 @@ module.exports = class Category {
     return result;
   }
 
-  static async getAllCategorySubcategory() {
+  async getAllCategorySubcategory() {
     let SPGetCategories = `
     select category.category_id as id, category.name as name, category.image as image_url, 
         COALESCE(
@@ -39,8 +39,10 @@ module.exports = class Category {
     return result;
   }
 
-  static async getAllCategorySubcategoryTask() {
+  async getAllCategorySubcategoryTask() {
+    const subcatInstance = new Subcategory();
     let result = await Category.getAllCategoriesForTask();
+
     // console.log(result);
     if (result.length == 0) {
       return null;
@@ -48,14 +50,14 @@ module.exports = class Category {
     // get subcategories
     // get all the subcategories for each category
     for (let i = 0; i < result.length; i++) {
-      let subcatResult = await Subcategory.getSubcatLiteByCategoryID(result[i].id);
+      let subcatResult = await subcatInstance.getSubcatLiteByCategoryID(result[i].id);
 
       // console.log('Subcat Result');
       // console.log(subcatResult);
       // get amount based on subcat
       let count = 0;
       for (let j = 0; j < subcatResult.length; j++) {       
-        let countResult = await Subcategory.getSubcatCountByID(subcatResult[j].id);
+        let countResult = await subcatInstance.getSubcatCountByID(subcatResult[j].id);
         // console.log('Count Result di Task Model');
         // console.log(countResult.count);
         count +=  parseInt(countResult.count);

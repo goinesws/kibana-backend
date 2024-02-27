@@ -6,15 +6,16 @@ const Review = require("../models/reviewModel");
 class User {
 	constructor() {}
 
-	static async getLoginInfo(username, password) {
-		// SP buat get client ID
-		let clientID;
-		if (username.includes("@")) {
-			let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
-			let res = await db.any(SPGetClientID);
-			clientID = res[0].client_id;
-			console.log(clientID);
-		}
+module.exports = class User {
+  async getLoginInfo(username, password) {
+    // SP buat get client ID
+    let clientID;
+    if (username.includes("@")) {
+      let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
+      let res = await db.any(SPGetClientID);
+      clientID = res[0].client_id;
+      console.log(clientID);
+    }
 
 		// SP buat cek dari DB
 		let SP = `select username, name, profile_image as profile_image_url from public.client where client_id = '${clientID}' and password = '${password}';`;
@@ -62,10 +63,10 @@ class User {
 		return result[0];
 	}
 
-	static async registerAsClient(email, username, name, phone, password) {
-		// Insert ke DB
-		let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`;
-		console.log(SP);
+  async registerAsClient(email, username, name, phone, password) {
+    // Insert ke DB
+    let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`;
+    console.log(SP);
 
 		var result;
 		try {
@@ -92,9 +93,9 @@ class User {
 		return result;
 	}
 
-	static async registerAsFreelancer(freelancer, username) {
-		// cek dlu udah ada di client blm
-		let checkerSP = `select count(*) from public.client where client_id ='${username}';`;
+  async registerAsFreelancer(freelancer, username) {
+    // cek dlu udah ada di client blm
+    let checkerSP = `select count(*) from public.client where client_id ='${username}';`;
 
 		var checkerResult;
 		try {
@@ -136,9 +137,9 @@ class User {
 		return { freelancer: freelancer };
 	}
 
-	static async getClientID(username) {
-		let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
-		let res = await db.any(SPGetClientID);
+  async getClientID(username) {
+    let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
+    let res = await db.any(SPGetClientID);
 
 		console.log(res[0].client_id + "RESCLEU");
 		var client_id = res[0].client_id;
@@ -146,16 +147,16 @@ class User {
 		return client_id;
 	}
 
-	static async getMyProfile(clientId) {
-		let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
+  async getMyProfile(clientId) {
+    let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
 
 		let result = await db.any(SP);
 
 		return result[0];
 	}
 
-	static async getBankDetails(clientId) {
-		let SP = `
+  async getBankDetails(clientId) {
+    let SP = `
     select 
     bank_name,
     beneficiary_name,
@@ -171,10 +172,10 @@ class User {
 		return result[0];
 	}
 
-	static async editMyprofile(clientId) {}
+  async editMyprofile(clientId) {}
 
-	static async editBankDetails(clientId, body) {
-		let SP = `
+  async editBankDetails(clientId, body) {
+    let SP = `
     UPDATE
     public.bank_information
     set

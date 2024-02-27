@@ -17,10 +17,10 @@ app.getNewService = async (req, res) =>  {
 
   const category_id = req.params.categoryId;
 
-  const service = new Service();
+  const serviceInstance = new Service();
   var serviceResult;
-  if(category_id) serviceResult = await Service.getNewService(category_id);
-  else serviceResult = await Service.getNewServiceNoCat();
+  if(category_id) serviceResult = await serviceInstance.getNewService(category_id);
+  else serviceResult = await serviceInstance.getNewServiceNoCat();
 
   if (Array.isArray(serviceResult) && serviceResult.length === 0) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -40,8 +40,8 @@ app.getServiceByCategory = async (req, res) =>  {
 
   const category_id = req.params.categoryId;
 
-  const service = new Service();
-  var serviceResult = await Service.getServiceByCategory(category_id);
+  const serviceInstance = new Service();
+  var serviceResult = await serviceInstance.getServiceByCategory(category_id);
 
   if (Array.isArray(serviceResult) && serviceResult.length === 0) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -59,7 +59,8 @@ app.getServiceList = async (req, res) =>  {
   result.error_schema = {};
   result.output_schema = {services: ''};
 
-  let serviceListResult = await Service.getServiceList(req.body);
+  const serviceInstance = new Service();
+  let serviceListResult = await serviceInstance.getServiceList(req.body);
   let total_amount = serviceListResult.length;
   let has_next_page = true;
 
@@ -101,13 +102,13 @@ app.getServiceDetail = async (req, res) =>  {
 
   const service_id = req.params.serviceId;
 
-  const service = new Service();
-  var serviceResult = await Service.getServiceDetail(service_id);
+  let serviceInstance = new Service();
+  var serviceResult = await serviceInstance.getServiceDetail(service_id);
 
-  const freelancer = new Freelancer();
-  var freelancerResult = await Freelancer.getFreelancerByServiceId(service_id);
+  let freelancerInstance = new Freelancer();
+  var freelancerResult = await freelancerInstance.getFreelancerByServiceId(service_id);
 
-  var reviewResult = await Service.getServiceReview(service_id);
+  var reviewResult = await serviceInstance.getServiceReview(service_id);
 
   if (Array.isArray(serviceResult) && serviceResult.length === 0) {
     result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -128,22 +129,23 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.createNewService = async (req, res) => {
+  var serviceInstance = new Service();
   let result = {};
   if (req.get('X-Token') == req.session.id) {
     var images = [];
 
-    images.push(await Service.addServiceImage(req.files['image_1']));
-    if(req.files['image_2']) images.push(await Service.addServiceImage(req.files['image_2']));
-    if(req.files['image_3']) images.push(await Service.addServiceImage(req.files['image_3']));
-    if(req.files['image_4']) images.push(await Service.addServiceImage(req.files['image_4']));
-    if(req.files['image_5']) images.push(await Service.addServiceImage(req.files['image_5']));
+    images.push(await serviceInstance.addServiceImage(req.files['image_1']));
+    if(req.files['image_2']) images.push(await serviceInstance.addServiceImage(req.files['image_2']));
+    if(req.files['image_3']) images.push(await serviceInstance.addServiceImage(req.files['image_3']));
+    if(req.files['image_4']) images.push(await serviceInstance.addServiceImage(req.files['image_4']));
+    if(req.files['image_5']) images.push(await serviceInstance.addServiceImage(req.files['image_5']));
   
     images = images.map(link => link.replace(/"/g, ''));
 
     var freelancerId = req.session.freelancer_id;
   
     //process data
-    var newServiceId = await Service.createNewService(images, req.body.data, freelancerId);
+    var newServiceId = await serviceInstance.createNewService(images, req.body.data, freelancerId);
   
     result = {};
   
@@ -173,8 +175,8 @@ app.getOwnedService = async (req, res) => {
 
     const freelancer_id = req.session.freelancer_id;
 
-    const service = new Service();
-    var serviceResult = await Service.getOwnedService(freelancer_id);
+    var serviceInstance = new Service();
+    var serviceResult = await serviceInstance.getOwnedService(freelancer_id);
 
     if (Array.isArray(serviceResult) && serviceResult.length === 0) {
       result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -206,11 +208,11 @@ app.getOwnedServiceDetail = async (req, res) => {
     const freelancer_id = req.session.freelancer_id;
     const service_id = req.params.serviceId;
 
-    const service = new Service();
-    var serviceOwner = await Service.getServiceOwner(service_id);
+    var serviceInstance = new Service();
+    var serviceOwner = await serviceInstance.getServiceOwner(service_id);
 
     if (serviceOwner == freelancer_id) {
-      var serviceResult = await Service.getOwnedServiceDetail(service_id);
+      var serviceResult = await serviceInstance.getOwnedServiceDetail(service_id);
 
       if (Array.isArray(serviceResult) && serviceResult.length === 0) {
         result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -243,11 +245,11 @@ app.getOwnedServiceOrders = async (req, res) => {
     const freelancer_id = req.session.freelancer_id;
     const service_id = req.params.serviceId;
 
-    const service = new Service();
-    var serviceOwner = await Service.getServiceOwner(service_id);
+    var serviceInstance = new Service();
+    var serviceOwner = await serviceInstance.getServiceOwner(service_id);
 
     if (serviceOwner == freelancer_id) {
-      var serviceResult = await Service.getOwnedServiceDetail(service_id);
+      var serviceResult = await serviceInstance.getOwnedServiceDetail(service_id);
 
       if (Array.isArray(serviceResult) && serviceResult.length === 0) {
         result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -280,11 +282,11 @@ app.deactivateService = async (req, res) => {
     const freelancer_id = req.session.freelancer_id;
     const service_id = req.params.serviceId;
 
-    const service = new Service();
-    var serviceOwner = await Service.getServiceOwner(service_id);
+    var serviceInstance = new Service();
+    var serviceOwner = await serviceInstance.getServiceOwner(service_id);
 
     if (serviceOwner == freelancer_id) {
-      var serviceResult = await Service.deactivateService(service_id);
+      var serviceResult = await serviceInstance.deactivateService(service_id);
 
       if (serviceResult == null) {
         result.error_schema = {'error_code': 903, 'error_message': 'Deactivate gagal.'};
@@ -317,11 +319,11 @@ app.deleteService = async (req, res) => {
     const freelancer_id = req.session.freelancer_id;
     const service_id = req.params.serviceId;
 
-    const service = new Service();
-    var serviceOwner = await Service.getServiceOwner(service_id);
+    var serviceInstance = new Service();
+    var serviceOwner = await serviceInstance.getServiceOwner(service_id);
 
     if (serviceOwner == freelancer_id) {
-      var serviceResult = await Service.deleteService(service_id);
+      var serviceResult = await serviceInstance.deleteService(service_id);
 
       if (serviceResult == null) {
         result.error_schema = {'error_code': 903, 'error_message': 'Delete gagal.'};
@@ -350,12 +352,11 @@ app.getServiceHistory = async (req, res) => {
   if (req.get('X-Token') == req.session.id) {
     result.error_schema = {};
     result.output_schema = {service_detail: ''};
+    var serviceInstance = new Service();
+    var userInstance = new User();
 
-    const client_id = User.getClientID(req.session.username);
-
-    const service = new Service();
-
-    var serviceResult = await Service.getClientServiceHistory(client_id);
+    const client_id = userInstance.getClientID(req.session.username);
+    var serviceResult = await serviceInstance.getClientServiceHistory(client_id);
 
     if (Array.isArray(serviceResult) && serviceResult.length === 0) {
       result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};

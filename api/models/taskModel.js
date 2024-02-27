@@ -6,7 +6,7 @@ const Freelancer = require("../models/freelancerModel");
 const Review = require("../models/reviewModel");
 
 module.exports = class Task {
-  static async getTaskList(headers) {
+  async getTaskList(headers) {
     const searchText = headers['search_text'];
     const subcategory = headers['sub_category'];
     const budget = headers['budget'];
@@ -49,9 +49,10 @@ module.exports = class Task {
     return result;
   }
 
-  static async getNewTaskByCategory(categoryId) {
+  async getNewTaskByCategory(categoryId) {
     // get list of SUBCAT BY CATEGORY ID
-    let subcat_list = await Subcategory.getListSubcatByCategoryID(categoryId);
+    const subcatInstance = new Subcategory();
+    let subcat_list = await subcatInstance.getListSubcatByCategoryID(categoryId);
 
     // console.log(subcat_list);
 
@@ -67,14 +68,16 @@ module.exports = class Task {
     return result;
   }
 
-  static async getTaskCategoryDetail(categoryId) {
-    let result = await Subcategory.getSubcatByCategoryID(categoryId);
+  async getTaskCategoryDetail(categoryId) {
+    const subcatInstance = new Subcategory();
+    let result = await subcatInstance.getSubcatByCategoryID(categoryId);
 
     if (result.length == 0) return null;
     else return result;
   }
 
-  static async getTaskCategories() {
+  async getTaskCategories() {
+    const subcatInstance = new Subcategory();
     let result = await Category.getAllCategoriesForTask();
     // console.log(result);
     if (result.length == 0) {
@@ -83,14 +86,14 @@ module.exports = class Task {
     // get subcategories
     // get all the subcategories for each category
     for (let i = 0; i < result.length; i++) {
-      let subcatResult = await Subcategory.getSubcatLiteByCategoryID(result[i].id);
+      let subcatResult = await subcatInstance.getSubcatLiteByCategoryID(result[i].id);
 
       // console.log('Subcat Result');
       // console.log(subcatResult);
       // get amount based on subcat
       let count = 0;
       for (let j = 0; j < subcatResult.length; j++) {       
-        let countResult = await Subcategory.getSubcatCountByID(subcatResult[j].id);
+        let countResult = await subcatInstance.getSubcatCountByID(subcatResult[j].id);
         // console.log('Count Result di Task Model');
         // console.log(countResult.count);
         count +=  parseInt(countResult.count);
@@ -102,7 +105,7 @@ module.exports = class Task {
     return result;
   }
 
-  static async getTaskDetails (taskId) {
+  async getTaskDetails (taskId) {
     let result = {};
     // SP buat task details
     let SPTaskDetails = `select task_id as id, name, tags, deadline as due_date, difficulty, price, description 
@@ -143,7 +146,7 @@ module.exports = class Task {
     return result;
   }
 
-  static async getTaskByClientId (userId) {
+  async getTaskByClientId (userId) {
     let SP =
     `
     select 

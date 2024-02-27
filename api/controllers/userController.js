@@ -8,14 +8,15 @@ app.loginFunction = async (req, res) => {
 	const username = req.body.username_email;
 	const password = req.body.password;
 
-	let login_info = await User.getLoginInfo(username, password);
+	const userInstance = new User();
+	let login_info = await userInstance.getLoginInfo(username, password);
 
 	let failed = false;
 	let curr_client_id = "";
 	if (login_info == null || login_info == undefined) {
 		failed = true;
 	} else {
-		curr_client_id = await User.getClientID(username);
+		curr_client_id = await userInstance.getClientID(username);
 	}
 
 	result = {};
@@ -42,7 +43,8 @@ app.registerFunction = async (req, res) => {
 	const phone = req.body.phone_number;
 	const password = req.body.password;
 
-	output_schema = await User.registerAsClient(
+	const userInstance = new User();
+	output_schema = await userInstance.registerAsClient(
 		email,
 		username,
 		name,
@@ -70,7 +72,8 @@ app.registerFreelancerFunction = async (req, res) => {
 	const freelancer = req.body.freelancer;
 	const username = req.body.username;
 
-	output_schema = await User.registerAsFreelancer(freelancer, username);
+	const userInstance = new User();
+	output_schema = await userInstance.registerAsFreelancer(freelancer, username);
 
 	result = {};
 
@@ -112,8 +115,10 @@ app.getOtherProfile = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	let clientDetails = await Client.getOtherClientProfile(userId);
-	let isFreelancer = await Freelancer.isFreelancer(userId);
+	const clientInstance = new Client();
+	const freelancerInstance = new Freelancer();
+	let clientDetails = await clientInstance.getOtherClientProfile(userId);
+	let isFreelancer = await freelancerInstance.isFreelancer(userId);
 
 	if (clientDetails == null) {
 		result.error_schema = {
@@ -138,7 +143,8 @@ app.getMyProfile = async (req, res) => {
 
 	let me;
 	if (req.get("X-Token") == req.session.id) {
-		me = await User.getMyProfile(req.session.client_id);
+		const userInstance = new User();
+		me = await userInstance.getMyProfile(req.session.client_id);
 		if (me == null) {
 			result.error_schema = {
 				error_code: 903,
@@ -165,7 +171,8 @@ app.getMyBankDetails = async (req, res) => {
 
 	let bank;
 	if (req.get("X-Token") == req.session.id) {
-		bank = await User.getBankDetails(req.session.client_id);
+		const userInstance = new User();
+		bank = await userInstance.getBankDetails(req.session.client_id);
 		if (bank == null) {
 			result.error_schema = {
 				error_code: 903,
@@ -218,7 +225,11 @@ app.editBankDetails = async (req, res) => {
 	if (req.session.id == req.get("X-Token")) {
 		// console.log(req.body);
 		try {
-			let change = await User.editBankDetails(req.session.client_id, req.body);
+			const userInstance = new User();
+			let change = await userInstance.editBankDetails(
+				req.session.client_id,
+				req.body
+			);
 			result.error_schema = { error_code: 200, error_message: "Success." };
 			result.output_schema = {};
 		} catch {

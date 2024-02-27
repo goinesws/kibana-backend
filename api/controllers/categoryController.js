@@ -7,8 +7,8 @@ app.getAllCategorySubcategory = async (req, res) =>  {
     result.error_schema = {};
     result.output_schema = {categories: ''};
   
-    const cat = new Category();
-    var subcatResult = await Category.getAllCategorySubcategory();
+    const catInstance = new Category();
+    var subcatResult = await catInstance.getAllCategorySubcategory();
   
     if (Array.isArray(subcatResult) && subcatResult.length === 0) {
       result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
@@ -27,7 +27,8 @@ app.getAllCategorySubcategoryTask = async (req, res) => {
   result.error_schema = {};
   result.output_schema = {categories: ''};
 
-  let category = await Category.getAllCategorySubcategoryTask();
+  const catInstance = new Category();
+  let category = await catInstance.getAllCategorySubcategoryTask();
 
   // console.log(taskResult);
 

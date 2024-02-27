@@ -11,7 +11,7 @@ const { v4: uuidv4 } = require('uuid');
 class Service {
     constructor(){}
 
-    static async getServiceOwner(service_id) {
+    async getServiceOwner(service_id) {
       try {
           var SP = `select freelancer_id from service where service_id = '${service_id}'`
           const result = await db.any(SP);
@@ -22,7 +22,7 @@ class Service {
       }
   }
 
-    static async getNewService(category_id) {
+    async getNewService(category_id) {
         try {
             var SP = `SELECT service_id as id, images as image_url, service.name,
             jsonb_build_object('image_url', client.profile_image, 'name', client.name) as freelancer,
@@ -59,7 +59,7 @@ class Service {
         }
     }
 
-    static async getNewServiceNoCat(category_id) {
+    async getNewServiceNoCat(category_id) {
         try {
             var SP = `SELECT service_id as id, images as image_url, service.name,
             jsonb_build_object('image_url', client.profile_image, 'name', client.name) as freelancer,
@@ -104,7 +104,7 @@ class Service {
     //     }
     // }
 
-    static async getServiceByCategory(category_id) {
+    async getServiceByCategory(category_id) {
         try {
             var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
             inner join subcategory on
@@ -117,7 +117,7 @@ class Service {
         }
     }
 
-    static async getServiceList(body) {
+    async getServiceList(body) {
         const searchText = body['search_text'];
         const subcategory = body['sub_category'];
         const budget = body['budget'];
@@ -192,7 +192,7 @@ class Service {
         return result;
       }
 
-      static async getServiceDetail(service_id) {
+      async getServiceDetail(service_id) {
         try {
             var SP = `select service.service_id as id,
             images as image_url,
@@ -232,7 +232,7 @@ class Service {
         }
     }
 
-    static async getServiceReview(service_id) {
+    async getServiceReview(service_id) {
       try {
           var SP = `SELECT 
             (SELECT AVG(rating)
@@ -271,7 +271,7 @@ class Service {
       }
   }
   
-  static async createNewService (images, data_incoming, clientId) {
+  async createNewService (images, data_incoming, clientId) {
     const serviceId = uuidv4();
     const data = JSON.parse(data_incoming);
     const name = data.name;
@@ -304,7 +304,7 @@ class Service {
     return serviceId; 
   }
 
-  static async addServiceImage(image) {
+  async addServiceImage(image) {
     var link;
     const clientId = '33df5c9de1e057a';
     var axios = require('axios');
@@ -336,7 +336,7 @@ class Service {
     return link;
   }
 
-  static async getOwnedService(freelancer_id) {
+  async getOwnedService(freelancer_id) {
     try {
         var SP = `select
         service_id as id,
@@ -378,7 +378,7 @@ class Service {
     }
 }
 
-static async getOwnedServiceDetail(service_id) {
+async getOwnedServiceDetail(service_id) {
   try {
       var SP = `SELECT 
       public.order.order_id as id,
@@ -421,7 +421,7 @@ static async getOwnedServiceDetail(service_id) {
   }
 }
 
-static async deactivateService(service_id) {
+async deactivateService(service_id) {
   try {
       var SP = `update service
       set is_active = FALSE
@@ -433,7 +433,7 @@ static async deactivateService(service_id) {
   }
 }
 
-static async deleteService(service_id) {
+async deleteService(service_id) {
   try {
       var SP = `delete from service
       where service_id = '${service_id}';`;
@@ -444,7 +444,7 @@ static async deleteService(service_id) {
   }
 }
 
-static async getClientServiceHistory(client_id) {
+async getClientServiceHistory(client_id) {
   try {
       var SP = `SELECT 
       service.service_id as id,
