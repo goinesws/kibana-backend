@@ -249,7 +249,7 @@ app.getOwnedServiceOrders = async (req, res) => {
     var serviceOwner = await serviceInstance.getServiceOwner(service_id);
 
     if (serviceOwner == freelancer_id) {
-      var serviceResult = await serviceInstance.getOwnedServiceDetail(service_id);
+      var serviceResult = await serviceInstance.getOwnedServiceOrders(service_id);
 
       if (Array.isArray(serviceResult) && serviceResult.length === 0) {
         result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};

@@ -91,19 +91,6 @@ class Service {
 		}
 	}
 
-	// static async getSubcategoryByCategory(category_id) {
-	//     try {
-	//         var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
-	//         inner join subcategory on
-	//         subcategory.subcategory_id = service.subcategory_id
-	//         where subcategory.category_id = '${category_id}'`;
-	//         const result = await db.any(SP);
-	//         return result;
-	//     } catch (error) {
-	//         throw new Error('Failed to fetch user tasks');
-	//     }
-	// }
-
 	async getServiceByCategory(category_id) {
 		try {
 			var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
@@ -368,38 +355,38 @@ class Service {
 	async getOwnedService(freelancer_id) {
 		try {
 			var SP = `select
-        service_id as id,
-        name,
-        working_time,
-        tags,
-        images as image_url,
-        price,
-        (SELECT AVG(rating)
-        FROM
-          review
-        WHERE
-        destination_id = service.service_id) as average_rating,
-        (SELECT COUNT(rating)
-        FROM 
+      service_id as id,
+      name,
+      working_time,
+      tags,
+      images as image_url,
+      price,
+      (SELECT AVG(rating)
+      FROM
         review
-        WHERE 
-        destination_id = service.service_id) as rating_amount,
-        (SELECT COUNT(order_id)
-        FROM 
-          public.order
-        WHERE 
-        public.order.service_id = service.service_id
-        AND
-        status = 'Dalam Proses') as in_progress_transaction_amount,
-        (SELECT 
-           CASE
-             WHEN is_active = TRUE THEN 1
-             ELSE 2
-         END AS status
-        )
-      
-      from service
-      where freelancer_id = '${freelancer_id}'`;
+      WHERE
+      destination_id = service.service_id) as average_rating,
+      (SELECT COUNT(rating)
+      FROM 
+      review
+      WHERE 
+      destination_id = service.service_id) as rating_amount,
+      (SELECT COUNT(transaction_id)
+      FROM 
+        transaction
+      WHERE 
+      transaction.project_id = service.service_id
+      AND
+      status = 'Dalam Proses') as in_progress_transaction_amount,
+      (SELECT 
+         CASE
+           WHEN is_active = TRUE THEN 1
+           ELSE 2
+       END AS status
+      )
+    
+    from service
+    where freelancer_id = '${freelancer_id}'`;
 			const result = await db.any(SP);
 			return result;
 		} catch (error) {
@@ -407,42 +394,95 @@ class Service {
 		}
 	}
 
-	async getOwnedServiceDetail(service_id) {
+  async getOwnedServiceDetail(service_id) {
+		try {
+			var SP = `SELECT
+      service.service_id AS id,
+      service.name,
+      service.working_time,
+      service.tags,
+      service.price,
+    jsonb_build_object(
+      'average_rating', (SELECT AVG(rating)
+                FROM
+                review
+                WHERE
+                destination_id = service.service_id),
+      'rating_amount', (SELECT COUNT(rating)
+                FROM 
+                review
+                WHERE 
+                destination_id = service.service_id),
+      'review_list', (SELECT
+              jsonb_agg(
+                jsonb_build_object(
+                  'name', client.name,
+                  'star', review.rating,
+                  'description', review.content,
+                  'timestamp', TO_CHAR(review.date, 'DD Mon YYYY')
+                )
+              )
+              FROM 
+                review
+              JOIN 
+                client on client.client_id = review.writer_id
+              WHERE 
+                review.destination_id = service.service_id)
+    ) AS review,
+    (SELECT 
+           CASE
+             WHEN is_active = TRUE THEN 1
+             ELSE 2
+         END AS status
+        )
+  FROM service
+  LEFT JOIN review on service.service_id = review.destination_id
+  LEFT JOIN client on client.client_id = review.writer_id
+  WHERE service.service_id = '${service_id}'
+  GROUP BY service.service_id`;
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch owned services detail");
+		}
+	}
+
+	async getOwnedServiceOrders(service_id) {
 		try {
 			var SP = `SELECT 
-      public.order.order_id as id,
-      public.order.status as status,
-      TO_CHAR(public.order.deadline, 'DD Mon YYYY') as due_date,
-      TO_CHAR(public.order.delivery_date, 'DD Mon YYYY') as delivery_date,
+      transaction.transaction_id as id,
+      transaction.status as status,
+      TO_CHAR(transaction.deadline, 'DD Mon YYYY') as due_date,
+      TO_CHAR(transaction.delivery_date, 'DD Mon YYYY') as delivery_date,
       jsonb_build_object(
         'id', client.client_id,
         'name', client.name,
         'profile_image_url', client.profile_image
       ) as client,
       CASE 
-        WHEN public.order.status IN ('Selesai', 'Dibatalkan') THEN
+        WHEN transaction.status IN ('Selesai', 'Dibatalkan') THEN
           EXISTS (
             SELECT 1
             FROM review
-            WHERE review.transaction_id = public.order.order_id
+            WHERE review.transaction_id = transaction.transaction_id
           )
         ELSE
           NULL
       END as is_reviewed,
       CASE 
-        WHEN public.order.status IN ('Selesai', 'Dibatalkan') AND
+        WHEN transaction.status IN ('Selesai', 'Dibatalkan') AND
              EXISTS (
                SELECT 1
                FROM review
-               WHERE review.transaction_id = public.order.order_id
+               WHERE review.transaction_id = transaction.transaction_id
              ) THEN
-          (SELECT rating FROM review WHERE transaction_id = public.order.order_id)
+          (SELECT rating FROM review WHERE transaction_id = transaction.transaction_id)
         ELSE
           NULL
       END as review
-    FROM public.order
-    JOIN client ON public.order.client_id = client.client_id
-    WHERE public.order.service_id = '${service_id}';`;
+    FROM transaction
+    JOIN client ON transaction.client_id = client.client_id
+    WHERE transaction.project_id = '${service_id}';`;
 			const result = await db.any(SP);
 			return result;
 		} catch (error) {
