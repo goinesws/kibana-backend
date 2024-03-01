@@ -121,5 +121,9 @@ router.get(
 );
 router.get("/api/account/tasks/:userId", clientController.getClientTask);
 router.get("/api/account/reviews/:userId", clientController.getClientReview);
+router.get(
+	"/api/account/edit/description",
+	freelancerController.editFreelancerDescription
+);
 
 module.exports = router;

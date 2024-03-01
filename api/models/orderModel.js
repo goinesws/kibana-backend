@@ -2,8 +2,8 @@ const express = require("express");
 const db = require("../../db");
 
 module.exports = class Order {
-  async getFreelancerProjectByUserId(userId) {
-    let SP = `
+	async getFreelancerProjectByUserId(userId) {
+		let SP = `
     select 
     s.name as project_name,
     r.rating as star,
@@ -27,8 +27,8 @@ module.exports = class Order {
     f.user_id = '${userId}'
     `;
 
-    let result = await db.any(SP);
+		let result = await db.any(SP);
 
-    return result;
-  }
+		return result;
+	}
 };

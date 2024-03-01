@@ -1,30 +1,30 @@
 const express = require("express");
 const db = require("../../db");
 const imgur = require("../../imgur");
-var multer = require('multer');
-const axios = require('axios');
-const FormData = require('form-data');
-const path = require('path');
-const Requirement = require('../models/requirementModel.js');
-const { v4: uuidv4 } = require('uuid');
+var multer = require("multer");
+const axios = require("axios");
+const FormData = require("form-data");
+const path = require("path");
+const Requirement = require("../models/requirementModel.js");
+const { v4: uuidv4 } = require("uuid");
 
 class Service {
-    constructor(){}
+	constructor() {}
 
-    async getServiceOwner(service_id) {
-      try {
-          var SP = `select freelancer_id from service where service_id = '${service_id}'`
-          const result = await db.any(SP);
-          console.log(result[0].freelancer_id);
-          return result[0].freelancer_id;
-      } catch (error) {
-          throw new Error('Failed to fetch freelancer id');
-      }
-  }
+	async getServiceOwner(service_id) {
+		try {
+			var SP = `select freelancer_id from service where service_id = '${service_id}'`;
+			const result = await db.any(SP);
+			console.log(result[0].freelancer_id);
+			return result[0].freelancer_id;
+		} catch (error) {
+			throw new Error("Failed to fetch freelancer id");
+		}
+	}
 
-    async getNewService(category_id) {
-        try {
-            var SP = `SELECT service_id as id, images as image_url, service.name,
+	async getNewService(category_id) {
+		try {
+			var SP = `SELECT service_id as id, images as image_url, service.name,
             jsonb_build_object('image_url', client.profile_image, 'name', client.name) as freelancer,
             (SELECT AVG(rating)
             FROM
@@ -51,17 +51,17 @@ class Service {
             where category.category_id = '${category_id}'
             ORDER BY
             service.created_date DESC
-            LIMIT 4`
-            const result = await db.any(SP);
-            return result;
-        } catch (error) {
-            throw new Error('Failed to fetch user tasks');
-        }
-    }
+            LIMIT 4`;
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch user tasks");
+		}
+	}
 
-    async getNewServiceNoCat(category_id) {
-        try {
-            var SP = `SELECT service_id as id, images as image_url, service.name,
+	async getNewServiceNoCat(category_id) {
+		try {
+			var SP = `SELECT service_id as id, images as image_url, service.name,
             jsonb_build_object('image_url', client.profile_image, 'name', client.name) as freelancer,
             (SELECT AVG(rating)
             FROM
@@ -84,46 +84,46 @@ class Service {
             ORDER BY
             service.created_date DESC
             LIMIT 4`;
-            const result = await db.any(SP);
-            return result;
-        } catch (error) {
-            throw new Error('Failed to fetch user tasks');
-        }
-    }
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch user tasks");
+		}
+	}
 
-    // static async getSubcategoryByCategory(category_id) {
-    //     try {
-    //         var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
-    //         inner join subcategory on
-    //         subcategory.subcategory_id = service.subcategory_id
-    //         where subcategory.category_id = '${category_id}'`;
-    //         const result = await db.any(SP);
-    //         return result;
-    //     } catch (error) {
-    //         throw new Error('Failed to fetch user tasks');
-    //     }
-    // }
+	// static async getSubcategoryByCategory(category_id) {
+	//     try {
+	//         var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
+	//         inner join subcategory on
+	//         subcategory.subcategory_id = service.subcategory_id
+	//         where subcategory.category_id = '${category_id}'`;
+	//         const result = await db.any(SP);
+	//         return result;
+	//     } catch (error) {
+	//         throw new Error('Failed to fetch user tasks');
+	//     }
+	// }
 
-    async getServiceByCategory(category_id) {
-        try {
-            var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
+	async getServiceByCategory(category_id) {
+		try {
+			var SP = `select service_id as id, service.name, service.description as desc, images as image_url from service
             inner join subcategory on
             subcategory.subcategory_id = service.subcategory_id
             where subcategory.category_id = '${category_id}'`;
-            const result = await db.any(SP);
-            return result;
-        } catch (error) {
-            throw new Error('Failed to fetch user tasks');
-        }
-    }
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch user tasks");
+		}
+	}
 
-    async getServiceList(body) {
-        const searchText = body['search_text'];
-        const subcategory = body['sub_category'];
-        const budget = body['budget'];
-        const workingTime = body['working_time'];
-    
-        let SP = `SELECT service_id as id, images as image_url, service.name,
+	async getServiceList(body) {
+		const searchText = body["search_text"];
+		const subcategory = body["sub_category"];
+		const budget = body["budget"];
+		const workingTime = body["working_time"];
+
+		let SP = `SELECT service_id as id, images as image_url, service.name,
         jsonb_build_object('profile_image_url', client.profile_image, 'name', client.name) as freelancer,
         (SELECT AVG(rating)
         FROM
@@ -147,54 +147,68 @@ class Service {
                         service.freelancer_id = freelancer.freelancer_id
         inner join client on
                         freelancer.user_id = client.client_id`;
-    
-        if (searchText !== "" && searchText) {
-          SP += ` WHERE (service.name || service.description ILIKE '%${searchText}%'
+
+		if (searchText !== "" && searchText) {
+			SP += ` WHERE (service.name || service.description ILIKE '%${searchText}%'
           OR '${searchText}' ILIKE ANY (service.tags))`;
-        }
-        if (subcategory !== "" && subcategory) {
-          if(searchText!=="") SP +=` AND`
-          else SP += ` WHERE`
-          SP += ` service.subcategory_id = '${subcategory}'`;
-        }
+		}
+		if (subcategory !== "" && subcategory) {
+			if (searchText !== "") SP += ` AND`;
+			else SP += ` WHERE`;
+			SP += ` service.subcategory_id = '${subcategory}'`;
+		}
 
-        if (budget !== "" && budget) {
-          const budgetObject = JSON.parse(budget);
-          const budgetStart = budgetObject.budget_start;
-          const budgetEnd = budgetObject.budget_end;
-    
-          if(searchText!=="" || searchText !== null || subcategory!=="" || subcategory!== null) SP +=` AND`
-          else SP += ` WHERE`
-          if (budget.budget_end !== null) {
-            SP += ` price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
-          } else {
-            SP += ` price > '${budgetStart}'`;
-          }
-        }
+		if (budget !== "" && budget) {
+			const budgetObject = JSON.parse(budget);
+			const budgetStart = budgetObject.budget_start;
+			const budgetEnd = budgetObject.budget_end;
 
-        if (workingTime !== "" && workingTime) {
-            const workingTimeObject = JSON.parse(workingTime);
-            const workingTimeStart = workingTimeObject.working_time_start;
-            const workingTimeEnd = workingTimeObject.working_time_end;
-      
-            if(searchText!=="" || subcategory!=="" || budget!=="" || searchText!==null || subcategory!==null || budget!==null) SP +=` AND`
-            else SP += ` WHERE`
-            if (workingTimeEnd !== null) {
-              SP += ` working_time BETWEEN '${workingTimeStart}' AND '${workingTimeEnd}'`;
-            } else {
-              SP += ` working_time > '${workingTimeStart}'`;
-            }
-          }
+			if (
+				searchText !== "" ||
+				searchText !== null ||
+				subcategory !== "" ||
+				subcategory !== null
+			)
+				SP += ` AND`;
+			else SP += ` WHERE`;
+			if (budget.budget_end !== null) {
+				SP += ` price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
+			} else {
+				SP += ` price > '${budgetStart}'`;
+			}
+		}
 
-        SP += ` ORDER BY service.created_date DESC`
-        let result = await db.any(SP);
-    
-        return result;
-      }
+		if (workingTime !== "" && workingTime) {
+			const workingTimeObject = JSON.parse(workingTime);
+			const workingTimeStart = workingTimeObject.working_time_start;
+			const workingTimeEnd = workingTimeObject.working_time_end;
 
-      async getServiceDetail(service_id) {
-        try {
-            var SP = `select service.service_id as id,
+			if (
+				searchText !== "" ||
+				subcategory !== "" ||
+				budget !== "" ||
+				searchText !== null ||
+				subcategory !== null ||
+				budget !== null
+			)
+				SP += ` AND`;
+			else SP += ` WHERE`;
+			if (workingTimeEnd !== null) {
+				SP += ` working_time BETWEEN '${workingTimeStart}' AND '${workingTimeEnd}'`;
+			} else {
+				SP += ` working_time > '${workingTimeStart}'`;
+			}
+		}
+
+		SP += ` ORDER BY service.created_date DESC`;
+		let result = await db.any(SP);
+
+		return result;
+	}
+
+	async getServiceDetail(service_id) {
+		try {
+			var SP = `select service.service_id as id,
             images as image_url,
             service.name,
             service.tags,
@@ -225,16 +239,16 @@ class Service {
               service.service_id = '${service_id}'
             GROUP BY 
               service.service_id`;
-            const result = await db.any(SP);
-            return result;
-        } catch (error) {
-            throw new Error('Failed to fetch user tasks');
-        }
-    }
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch user tasks");
+		}
+	}
 
-    async getServiceReview(service_id) {
-      try {
-          var SP = `SELECT 
+	async getServiceReview(service_id) {
+		try {
+			var SP = `SELECT 
             (SELECT AVG(rating)
             FROM
               review
@@ -263,82 +277,97 @@ class Service {
                 ) AS review_list
             FROM service
         WHERE service_id = '${service_id}'
-        ORDER BY service.created_date DESC`
-          const result = await db.any(SP);
-          return result[0];
-      } catch (error) {
-          throw new Error('Failed to fetch user tasks');
-      }
-  }
-  
-  async createNewService (images, data_incoming, clientId) {
-    const serviceId = uuidv4();
-    const data = JSON.parse(data_incoming);
-    const name = data.name;
-    const subCategory = data.sub_category;
-    const workingTime = data.working_time;
-    const revisionCount = data.revision_count;
-    const description = data.description;
-    const price = data.price;
-    const tags = data.tags;
-    const additionalInfo = data.additional_info;
-    const freelancerId = clientId;
+        ORDER BY service.created_date DESC`;
+			const result = await db.any(SP);
+			return result[0];
+		} catch (error) {
+			throw new Error("Failed to fetch user tasks");
+		}
+	}
 
-    console.log(clientId)
+	async createNewService(images, data_incoming, clientId) {
+		const serviceId = uuidv4();
+		const data = JSON.parse(data_incoming);
+		const name = data.name;
+		const subCategory = data.sub_category;
+		const workingTime = data.working_time;
+		const revisionCount = data.revision_count;
+		const description = data.description;
+		const price = data.price;
+		const tags = data.tags;
+		const additionalInfo = data.additional_info;
+		const freelancerId = clientId;
 
-    // console.log(tags)
-    additionalInfo.forEach((item, index) => {
-      Requirement.createNewRequirement(item.id, serviceId, item.is_supported);
-    });
+		console.log(clientId);
 
-    if(!name || !subCategory || !workingTime || !revisionCount || !description || !price || !tags || !additionalInfo || !freelancerId) return "";
+		// console.log(tags)
+		additionalInfo.forEach((item, index) => {
+			Requirement.createNewRequirement(item.id, serviceId, item.is_supported);
+		});
 
-    let SP = `
+		if (
+			!name ||
+			!subCategory ||
+			!workingTime ||
+			!revisionCount ||
+			!description ||
+			!price ||
+			!tags ||
+			!additionalInfo ||
+			!freelancerId
+		)
+			return "";
+
+		let SP = `
     INSERT INTO service (service_id, subcategory_id, freelancer_id, name, description, tags, price, working_time, images, revision_count, is_active, created_date)
     VALUES
-    ('${serviceId}', '${subCategory}', '${freelancerId}', '${name}', '${description}', ARRAY['${tags.join("','")}'], ${price}, ${workingTime}, ARRAY['${images.join("','")}'], ${revisionCount}, TRUE, CURRENT_TIMESTAMP);
-    `
+    ('${serviceId}', '${subCategory}', '${freelancerId}', '${name}', '${description}', ARRAY['${tags.join(
+			"','"
+		)}'], ${price}, ${workingTime}, ARRAY['${images.join(
+			"','"
+		)}'], ${revisionCount}, TRUE, CURRENT_TIMESTAMP);
+    `;
 
-    await db.any(SP)
-  
-    return serviceId; 
-  }
+		await db.any(SP);
 
-  async addServiceImage(image) {
-    var link;
-    const clientId = '33df5c9de1e057a';
-    var axios = require('axios');
-    var data = new FormData();
-    data.append('image', image[0].buffer, { filename: `test.jpg` });
-    // data.append('image', fs.createReadStream('/home/flakrim/Downloads/GHJQTpX.jpeg'));
-  
-    var config = {
-      method: 'post',
-    maxBodyLength: Infinity,
-      url: 'https://api.imgur.com/3/image',
-      headers: { 
-        'Authorization': `Client-ID ${clientId}`, 
-        ...data.getHeaders()
-      },
-      data : data
-    };
-  
-    await axios(config)
-    .then(function (response) {
-      // console.log(JSON.stringify(response.data.data.link));
-      link = JSON.stringify(response.data.data.link);
-      return response.data.data.link;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+		return serviceId;
+	}
 
-    return link;
-  }
+	async addServiceImage(image) {
+		var link;
+		const clientId = "33df5c9de1e057a";
+		var axios = require("axios");
+		var data = new FormData();
+		data.append("image", image[0].buffer, { filename: `test.jpg` });
+		// data.append('image', fs.createReadStream('/home/flakrim/Downloads/GHJQTpX.jpeg'));
 
-  async getOwnedService(freelancer_id) {
-    try {
-        var SP = `select
+		var config = {
+			method: "post",
+			maxBodyLength: Infinity,
+			url: "https://api.imgur.com/3/image",
+			headers: {
+				Authorization: `Client-ID ${clientId}`,
+				...data.getHeaders(),
+			},
+			data: data,
+		};
+
+		await axios(config)
+			.then(function (response) {
+				// console.log(JSON.stringify(response.data.data.link));
+				link = JSON.stringify(response.data.data.link);
+				return response.data.data.link;
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+
+		return link;
+	}
+
+	async getOwnedService(freelancer_id) {
+		try {
+			var SP = `select
         service_id as id,
         name,
         working_time,
@@ -371,16 +400,16 @@ class Service {
       
       from service
       where freelancer_id = '${freelancer_id}'`;
-        const result = await db.any(SP);
-        return result;
-    } catch (error) {
-        throw new Error('Failed to fetch owned services');
-    }
-}
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch owned services");
+		}
+	}
 
-async getOwnedServiceDetail(service_id) {
-  try {
-      var SP = `SELECT 
+	async getOwnedServiceDetail(service_id) {
+		try {
+			var SP = `SELECT 
       public.order.order_id as id,
       public.order.status as status,
       TO_CHAR(public.order.deadline, 'DD Mon YYYY') as due_date,
@@ -414,39 +443,39 @@ async getOwnedServiceDetail(service_id) {
     FROM public.order
     JOIN client ON public.order.client_id = client.client_id
     WHERE public.order.service_id = '${service_id}';`;
-      const result = await db.any(SP);
-      return result;
-  } catch (error) {
-      throw new Error('Failed to fetch owned services detail');
-  }
-}
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch owned services detail");
+		}
+	}
 
-async deactivateService(service_id) {
-  try {
-      var SP = `update service
+	async deactivateService(service_id) {
+		try {
+			var SP = `update service
       set is_active = FALSE
       where service_id = '${service_id}';`;
-      const result = await db.any(SP);
-      return "Successfully deactivated service";
-  } catch (error) {
-      throw new Error('Failed to deactivate service');
-  }
-}
+			const result = await db.any(SP);
+			return "Successfully deactivated service";
+		} catch (error) {
+			throw new Error("Failed to deactivate service");
+		}
+	}
 
-async deleteService(service_id) {
-  try {
-      var SP = `delete from service
+	async deleteService(service_id) {
+		try {
+			var SP = `delete from service
       where service_id = '${service_id}';`;
-      const result = await db.any(SP);
-      return "Successfully deleted service";
-  } catch (error) {
-      throw new Error('Failed to deactivate service');
-  }
-}
+			const result = await db.any(SP);
+			return "Successfully deleted service";
+		} catch (error) {
+			throw new Error("Failed to deactivate service");
+		}
+	}
 
-async getClientServiceHistory(client_id) {
-  try {
-      var SP = `SELECT 
+	async getClientServiceHistory(client_id) {
+		try {
+			var SP = `SELECT 
       service.service_id as id,
       service.name as name,
       service.tags,
@@ -496,19 +525,12 @@ async getClientServiceHistory(client_id) {
   JOIN freelancer ON service.freelancer_id = freelancer.freelancer_id
   JOIN client ON freelancer.user_id = client.client_id 
   WHERE public.order.client_id = '${client_id}';`;
-      const result = await db.any(SP);
-      return result;
-  } catch (error) {
-      throw new Error('Failed to fetch owned services detail');
-  }
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch owned services detail");
+		}
+	}
 }
-
-}
-
-
-
-
 
 module.exports = Service;
-
-

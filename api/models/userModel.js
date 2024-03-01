@@ -1,7 +1,6 @@
 const express = require("express");
 const db = require("../../db");
 const crypto = require("crypto");
-const Review = require("../models/reviewModel");
 
 module.exports = class User {
 	async getLoginInfo(username, password) {
@@ -190,5 +189,3 @@ module.exports = class User {
 		return res;
 	}
 };
-
-module.exports = User;
