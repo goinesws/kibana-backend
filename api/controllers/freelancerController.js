@@ -202,7 +202,7 @@ app.editFreelancerDescription = async (req, res) => {
 	if (edit_result == null) {
 		result.error_schema = {
 			error_code: 903,
-			error_message: "Tidak ada data yang ditemukan.",
+			error_message: "Edit tidak dapat dilakukan.",
 		};
 		result.output_schema = {};
 	} else {
@@ -213,7 +213,51 @@ app.editFreelancerDescription = async (req, res) => {
 	res.send(result);
 };
 
-app.editFreelancerSkill = async (req, res) => {};
+app.editFreelancerSkills = async (req, res) => {
+	// get user_id dari session token
+	// dari user_id merge ama fl get fl_id
+	// dari fl_id
+	let result = {};
+
+	result.error_schema = {};
+	result.output_schema = {};
+
+	let skills = JSON.stringify(req.body.skills);
+	console.log(skills);
+	skills = skills.replace("[", "{");
+	skills = skills.replace("]", "}");
+
+	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
+		userId = req.session.client_id;
+	} else {
+		result.error_schema = {
+			error_code: 403,
+			error_message: "Anda tidak memiliki akses untuk hal tersebut.",
+		};
+		result.output_schema = {};
+		res.send(result);
+		return;
+	}
+
+	let freelancerInstance = new Freelancer();
+	let edit_result = await freelancerInstance.editFreelancerSkills(
+		userId,
+		skills
+	);
+
+	if (edit_result == null) {
+		result.error_schema = {
+			error_code: 903,
+			error_message: "Edit tidak dapat dilakukan.",
+		};
+		result.output_schema = {};
+	} else {
+		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.output_schema = edit_result;
+	}
+
+	res.send(result);
+};
 
 app.editFreelancerEducation = async (req, res) => {};
 

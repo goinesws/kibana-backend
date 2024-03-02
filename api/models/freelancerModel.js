@@ -228,8 +228,16 @@ module.exports = class Freelancer {
 		return result;
 	}
 
-	async editFreelancerSkill(userId, skill) {
-		let SP = ``;
+	async editFreelancerSkills(userId, skill) {
+		let SP = `
+		UPDATE  
+		public.freelancer 
+		set
+		skills = '${skill}'
+		where
+		user_id = '${userId}'`;
+
+		console.log(SP);
 
 		let result = await db.any(SP);
 
