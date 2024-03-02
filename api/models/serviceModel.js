@@ -520,9 +520,9 @@ class Service {
       service.name as name,
       service.tags,
       service.price,
-      public.order.status as status,
-      TO_CHAR(public.order.deadline, 'DD Mon YYYY') as due_date,
-      TO_CHAR(public.order.delivery_date, 'DD Mon YYYY') as delivery_date,
+      transaction.status as status,
+      TO_CHAR(transaction.deadline, 'DD Mon YYYY') as due_date,
+      TO_CHAR(transaction.delivery_date, 'DD Mon YYYY') as delivery_date,
       jsonb_build_object(
           'id', freelancer.freelancer_id,
           'name', client.name,
@@ -538,33 +538,33 @@ class Service {
       review
       WHERE 
       destination_id = service.service_id) as rating_amount,
-      public.order.order_id as transaction_id,
+      transaction.transaction_id as transaction_id,
       CASE 
-          WHEN public.order.status IN ('Selesai', 'Dibatalkan') THEN
+          WHEN transaction.status IN ('Selesai', 'Dibatalkan') THEN
           EXISTS (
               SELECT 1
               FROM review
-              WHERE review.transaction_id = public.order.order_id
+              WHERE review.transaction_id = transaction.transaction_id
           )
           ELSE
           NULL
       END as is_reviewed,
       CASE 
-          WHEN public.order.status IN ('Selesai', 'Dibatalkan') AND
+          WHEN transaction.status IN ('Selesai', 'Dibatalkan') AND
           EXISTS (
               SELECT 1
               FROM review
-              WHERE review.transaction_id = public.order.order_id
+              WHERE review.transaction_id = transaction.transaction_id
           ) THEN
-          jsonb_build_object('amount', (SELECT rating FROM review WHERE transaction_id = public.order.order_id))
+          jsonb_build_object('amount', (SELECT rating FROM review WHERE transaction_id = transaction.transaction_id))
           ELSE
           NULL
       END as review
-  FROM public.order
-  JOIN service ON service.service_id = public.order.service_id
+  FROM transaction
+  JOIN service ON service.service_id = transaction.project_id
   JOIN freelancer ON service.freelancer_id = freelancer.freelancer_id
   JOIN client ON freelancer.user_id = client.client_id 
-  WHERE public.order.client_id = '${client_id}';`;
+  WHERE transaction.client_id = '${client_id}';`;
 			const result = await db.any(SP);
 			return result;
 		} catch (error) {
