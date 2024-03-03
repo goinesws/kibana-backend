@@ -4,33 +4,50 @@ const User = require("../models/userModel");
 const Client = require("../models/clientModel.js");
 const Freelancer = require("../models/freelancerModel.js");
 
+// done refactor
 app.loginFunction = async (req, res) => {
 	const username = req.body.username_email;
 	const password = req.body.password;
 
 	const userInstance = new User();
-	let login_info = await userInstance.getLoginInfo(username, password);
+	// let login_info = await userInstance.getLoginInfo(username, password);
 
-	let failed = false;
-	let curr_client_id = "";
-	if (login_info == null || login_info == undefined) {
-		failed = true;
-	} else {
-		curr_client_id = await userInstance.getClientID(username);
-	}
+	// let failed = false;
+	// let curr_client_id = "";
+	// if (login_info == null || login_info == undefined) {
+	// 	failed = true;
+	// } else {
+	// 	curr_client_id = await userInstance.getClientID(username);
+	// }
+
+	let login_info = await userInstance.login(username, password);
 
 	result = {};
 
-	if (failed) {
+	console.log(login_info);
+
+	if (
+		login_info instanceof Error ||
+		login_info == null ||
+		login_info == undefined
+	) {
 		result.error_schema = { error_code: 999, error_message: "Login Gagal." };
 		result.output_schema = {};
 	} else {
+		req.session.client_id = login_info.id;
+		req.session.is_freelancer = login_info.is_freelancer;
+		req.session.freelancer_id = login_info.freelancer_id;
+
+		// remove freelancer_id dari login_info
+		delete login_info["freelancer_id"];
+
+		console.log(req.session.is_freelancer);
+		console.log(req.session.freelancer_id);
+		console.log(req.session.client_id);
+
 		result.error_schema = { error_code: 200, error_message: "Sukses." };
 		result.output_schema = login_info;
 		result.output_schema.token = req.session.id;
-		req.session.client_id = curr_client_id;
-		req.session.is_freelancer = login_info.is_freelancer;
-		req.session.freelancer_id = login_info.freelancer_id;
 		req.session.username = login_info.username;
 	}
 
@@ -69,6 +86,7 @@ app.registerFunction = async (req, res) => {
 	res.send(result);
 };
 
+// pindah ke client controller
 app.registerFreelancerFunction = async (req, res) => {
 	const freelancer = req.body.freelancer;
 	const username = req.body.username;
@@ -200,10 +218,33 @@ app.editMyProfile = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	console.log(req.session.id);
-	console.log(req.get("X-Token"));
+	// console.log(req.session.id);
+	// console.log(req.get("X-Token"));
 
 	if (req.session.id == req.get("X-Token")) {
+		let userId = req.session.client_id;
+		let userInstance = new User();
+		let images = [];
+
+		images.push(await userInstance.addUserImage(req.files["profile_image"]));
+
+		console.log(images);
+		images = images.map((link) => link.replace(/"/g, ""));
+
+		// parse JSON dari form-data biar jadi proper JSON dulu
+		let data = JSON.parse(req.body.data);
+
+		// abis ngebuat image
+		// masuk ke usermodel buat edit data2nya
+		let user_edit = await userInstance.editMyprofile(userId, data, images[0]);
+
+		if (user_edit instanceof Error) {
+			result.error_schema = { error_code: 999, error_message: "Gagal." };
+			result.output_schema = {};
+		} else {
+			result.error_schema = { error_code: 200, error_message: "Success." };
+			result.output_schema = {};
+		}
 	} else {
 		result.error_schema = { error_code: 403, error_message: "Forbidden." };
 		result.output_schema = null;
@@ -237,12 +278,13 @@ app.editBankDetails = async (req, res) => {
 			result.error_schema = { error_code: 999, error_message: "Gagal." };
 			result.output_schema = {};
 		}
+		res.send(result);
 	} else {
 		result.error_schema = { error_code: 403, error_message: "Forbidden." };
 		result.output_schema = {};
+		res.send(result);
+		return;
 	}
-
-	res.send(result);
 };
 
 module.exports = app;

@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("../../db");
 const Order = require("../models/orderModel");
+const FormData = require("form-data");
 
 module.exports = class Freelancer {
 	async getFreelancerByTaskID(taskId) {
@@ -134,9 +135,9 @@ module.exports = class Freelancer {
     join 
     public.freelancer 
     on 
-    public.freelancer.user_id = public.client.client_id
-	join
-	service on service.freelancer_id = freelancer.freelancer_id
+		public.freelancer.user_id = public.client.client_id
+		join
+		service on service.freelancer_id = freelancer.freelancer_id
    	where
     service.service_id = '${serviceId}';`;
 
@@ -221,9 +222,31 @@ module.exports = class Freelancer {
 
 	async editFreelancerEducation(userId, education) {
 		// ini SP buat insert educationHistory
-		let SP = ``;
+		let SP_insert = `
+		insert 
+		into
+		public.education
+		(education_id, freelancer_id, degree, major, university, country, year)
+		values
+		(CONCAT('EDU', (select nextval('education_id_sequence'))), 
+		(select freelancer_id from public.freelancer where user_id = '${userId}' ), 
+		'${education.degree}', '${education.major}', '${education.university}', '${education.country}', ${education.graducation_year});`;
 
-		let result = await db.any(SP);
+		// ini SP buat edit
+		let SP_edit = `
+		update 
+		public.education
+		set
+		degree = '${education.degree},
+		major = '${education.major}',
+		university = '${education.university}',
+		country = '${education.country}',
+		year = ${education.year}
+		where 
+		freelancer_id = (select frelancer_id from public.freelancer where userId = '${userId}')
+		`;
+
+		let result = await db.any(SP_insert);
 
 		return result;
 	}
@@ -237,16 +260,78 @@ module.exports = class Freelancer {
 		where
 		user_id = '${userId}'`;
 
-		console.log(SP);
-
 		let result = await db.any(SP);
 
 		return result;
 	}
 
-	// pake multer buat file
-	async editFreelancerCV() {}
+	async addFreelancerImage(image) {
+		let link = "";
+		const clientId = "33df5c9de1e057a";
+		var axios = require("axios");
+		var data = new FormData();
 
-	// pake multer buat file
-	async editFreelancerPortfolio() {}
+		data.append("image", image[0].buffer, { filename: `test.jpg` });
+
+		var config = {
+			method: "post",
+			maxBodyLength: Infinity,
+			url: "https://api.imgur.com/3/image",
+			headers: {
+				Authorization: `Client-ID ${clientId}`,
+				...data.getHeaders(),
+			},
+			data: data,
+		};
+
+		await axios(config)
+			.then(function (response) {
+				// console.log(JSON.stringify(response.data.data.link));
+				link = JSON.stringify(response.data.data.link);
+				return response.data.data.link;
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+
+		return link;
+	}
+
+	async editFreelancerCV(userId, cv_url) {
+		let SP = `
+		update 
+		public.freelancer
+		set 
+		cv = '${cv_url}'
+		where
+		user_id = '${userId}';`;
+
+		console.log(SP);
+
+		try {
+			let result = await db.any(SP);
+			return result;
+		} catch (error) {
+			return new Error("Edit Gagal");
+		}
+	}
+
+	async editFreelancerPortfolio(userId, portfolio_url) {
+		let SP = `
+		update 
+		public.freelancer
+		set 
+		portfolio = '${portfolio_url}'
+		where
+		user_id = '${userId}';`;
+
+		console.log(SP);
+
+		try {
+			let result = await db.any(SP);
+			return result;
+		} catch (error) {
+			return new Error("Edit Gagal");
+		}
+	}
 };
