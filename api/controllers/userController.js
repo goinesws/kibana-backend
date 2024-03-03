@@ -31,6 +31,7 @@ app.loginFunction = async (req, res) => {
 		req.session.client_id = curr_client_id;
 		req.session.is_freelancer = login_info.is_freelancer;
 		req.session.freelancer_id = login_info.freelancer_id;
+		req.session.username = login_info.username;
 	}
 
 	res.send(result);

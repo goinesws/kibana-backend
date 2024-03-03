@@ -8,6 +8,7 @@ const subcategoryController = require("../controllers/subcategoryController");
 const categoryController = require("../controllers/categoryController");
 const clientController = require("../controllers/clientController");
 const freelancerController = require("../controllers/freelancerController");
+const transactionController = require("../controllers/transactionController");
 
 const multer = require("multer");
 
@@ -133,5 +134,9 @@ router.post(
 	"/api/account/edit/skills",
 	freelancerController.editFreelancerEducation
 );
+
+
+//transaction related
+router.get("/api/transaction/invoice/:transactionId", transactionController.getTransactionInvoice);
 
 module.exports = router;
