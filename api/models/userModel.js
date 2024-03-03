@@ -1,9 +1,11 @@
 const express = require("express");
 const db = require("../../db");
 const crypto = require("crypto");
+const FormData = require("form-data");
 
 module.exports = class User {
 	async getLoginInfo(username, password) {
+		// Kalau sempet ini akan di rewrite
 		// SP buat get client ID
 		let clientID;
 		if (username.includes("@")) {
@@ -15,7 +17,7 @@ module.exports = class User {
 
 		// SP buat cek dari DB
 		let SP = `select username, name, profile_image as profile_image_url from public.client where client_id = '${clientID}' and password = '${password}';`;
-		console.log(SP);
+		console.log(clientID);
 
 		var result;
 		try {
@@ -27,14 +29,15 @@ module.exports = class User {
 		if (result == null || result[0] == undefined) return result[0];
 
 		// SP buat cek status
-		let SPStatus = `select count(*) as status from public.freelancer where "user_id" = '${clientID}';`;
+		let SPStatus = `select count(*) as status from public.freelancer where user_id = '${clientID}';`;
 
 		var status = await db.any(SPStatus);
 
+		console.log(status);
 		console.log(result);
 		console.log(result[0]);
 
-		if (status == 0) {
+		if (status[0].status == "0") {
 			result[0].is_freelancer = false;
 		} else {
 			result[0].is_freelancer = true;
@@ -49,8 +52,9 @@ module.exports = class User {
 		let SPBank = `select count(*) from public.bank_information where user_id = '${clientID}';`;
 
 		var bank = await db.any(SPBank);
+		console.log(bank);
 
-		if (bank == 0) {
+		if (bank[0].count == 0) {
 			result[0].is_connected_bank = false;
 		} else {
 			result[0].is_connected_bank = true;
@@ -168,7 +172,29 @@ module.exports = class User {
 		return result[0];
 	}
 
-	async editMyprofile(clientId) {}
+	async editMyprofile(clientId, data, image_url) {
+		let SP = `
+		update 
+		public.client
+		set 
+		profile_image = '${image_url}',
+		email = '${data.email}',
+		name = '${data.name}',
+		username = '${data.username}',
+		phone_number = '${data.phone_number}'
+		where client_id = '${clientId}'
+		`;
+
+		console.log(SP);
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Edit.");
+		}
+	}
 
 	async editBankDetails(clientId, body) {
 		let SP = `
@@ -187,5 +213,37 @@ module.exports = class User {
 		// console.log(res);
 
 		return res;
+	}
+
+	async addUserImage(image) {
+		let link = "";
+		const clientId = "33df5c9de1e057a";
+		var axios = require("axios");
+		var data = new FormData();
+
+		data.append("image", image[0].buffer, { filename: `test.jpg` });
+
+		var config = {
+			method: "post",
+			maxBodyLength: Infinity,
+			url: "https://api.imgur.com/3/image",
+			headers: {
+				Authorization: `Client-ID ${clientId}`,
+				...data.getHeaders(),
+			},
+			data: data,
+		};
+
+		await axios(config)
+			.then(function (response) {
+				// console.log(JSON.stringify(response.data.data.link));
+				link = JSON.stringify(response.data.data.link);
+				return response.data.data.link;
+			})
+			.catch(function (error) {
+				console.log(error);
+			});
+
+		return link;
 	}
 };

@@ -8,6 +8,7 @@ const subcategoryController = require("../controllers/subcategoryController");
 const categoryController = require("../controllers/categoryController");
 const clientController = require("../controllers/clientController");
 const freelancerController = require("../controllers/freelancerController");
+const reviewController = require("../controllers/reviewController");
 
 const multer = require("multer");
 
@@ -92,9 +93,9 @@ router.get(
 );
 
 // Account Related
+// Account GET
 router.get("/api/account/profile/:userId", userController.getOtherProfile);
 router.get("/api/account/my/profile", userController.getMyProfile);
-router.get("/api/account/edit/profile", userController.editMyProfile);
 router.get("/api/account/bank-detail", userController.getMyBankDetails);
 router.get("/api/account/edit/bank-detail", userController.editBankDetails);
 router.get(
@@ -121,6 +122,12 @@ router.get(
 );
 router.get("/api/account/tasks/:userId", clientController.getClientTask);
 router.get("/api/account/reviews/:userId", clientController.getClientReview);
+// Account POST
+router.post(
+	"/api/account/edit/profile",
+	upload.fields([{ name: "profile_image", maxCount: 1 }]),
+	userController.editMyProfile
+);
 router.post(
 	"/api/account/edit/description",
 	freelancerController.editFreelancerDescription
@@ -130,8 +137,23 @@ router.post(
 	freelancerController.editFreelancerSkills
 );
 router.post(
-	"/api/account/edit/skills",
+	"/api/account/edit/educations",
 	freelancerController.editFreelancerEducation
 );
+router.post(
+	"/api/account/edit/cv",
+	upload.fields([{ name: "cv", maxCount: 1 }]),
+	freelancerController.editFreelancerCV
+);
+router.post(
+	"/api/account/edit/portfolio",
+	upload.fields([{ name: "portfolio", maxCount: 1 }]),
+	freelancerController.editFreelancerPortfolio
+);
+
+// Review Related
+router.post("/api/review/client", reviewController.insertReviewClient);
+router.post("/api/review/freelancer", reviewController.insertReviewFreelancer);
+router.post("/api/review/service", reviewController.insertReviewService);
 
 module.exports = router;

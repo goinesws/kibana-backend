@@ -199,10 +199,33 @@ app.editMyProfile = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	console.log(req.session.id);
-	console.log(req.get("X-Token"));
+	// console.log(req.session.id);
+	// console.log(req.get("X-Token"));
 
 	if (req.session.id == req.get("X-Token")) {
+		let userId = req.session.client_id;
+		let userInstance = new User();
+		let images = [];
+
+		images.push(await userInstance.addUserImage(req.files["profile_image"]));
+
+		console.log(images);
+		images = images.map((link) => link.replace(/"/g, ""));
+
+		// parse JSON dari form-data biar jadi proper JSON dulu
+		let data = JSON.parse(req.body.data);
+
+		// abis ngebuat image
+		// masuk ke usermodel buat edit data2nya
+		let user_edit = await userInstance.editMyprofile(userId, data, images[0]);
+
+		if (user_edit instanceof Error) {
+			result.error_schema = { error_code: 999, error_message: "Gagal." };
+			result.output_schema = {};
+		} else {
+			result.error_schema = { error_code: 200, error_message: "Success." };
+			result.output_schema = {};
+		}
 	} else {
 		result.error_schema = { error_code: 403, error_message: "Forbidden." };
 		result.output_schema = null;
@@ -236,12 +259,13 @@ app.editBankDetails = async (req, res) => {
 			result.error_schema = { error_code: 999, error_message: "Gagal." };
 			result.output_schema = {};
 		}
+		res.send(result);
 	} else {
 		result.error_schema = { error_code: 403, error_message: "Forbidden." };
 		result.output_schema = {};
+		res.send(result);
+		return;
 	}
-
-	res.send(result);
 };
 
 module.exports = app;

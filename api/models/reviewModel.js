@@ -140,4 +140,97 @@ module.exports = class Review {
 
 		return result[0].count;
 	}
+
+	async insertClientReview(freelancerId, data) {
+		// init date
+		var datetime = new Date();
+		datetime = datetime.toISOString().slice(0, 10);
+
+		let SP = `
+    insert 
+    into 
+    public.review
+    (review_id, writer_id, destination_id, rating, content, date, transaction_id)
+    values 
+    (
+    CONCAT('R', (select nextval('review_id_sequence'))),
+    '${freelancerId}',
+    (select client_id from public.transaction where transaction_id = '${data.transaction_id}'),
+    ${data.star},
+    '${data.description}',
+    '${datetime}',
+    '${data.transaction_id}'
+    )
+    `;
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Insert Review.");
+		}
+	}
+
+	async insertFreelancerReview(userId, data) {
+		var datetime = new Date();
+		datetime = datetime.toISOString().slice(0, 10);
+
+		let SP = `
+    insert 
+    into 
+    public.review
+    (review_id, writer_id, destination_id, rating, content, date, transaction_id)
+    values 
+    (
+    CONCAT('R', (select nextval('review_id_sequence'))),
+    '${userId}',
+    (select freelancer_id from public.transaction where transaction_id = '${data.transaction_id}'),
+    ${data.star},
+    '${data.description}',
+    '${datetime}',
+    '${data.transaction_id}'
+    )
+    `;
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Insert Review.");
+		}
+	}
+
+	async insertServiceReview(userId, data) {
+		var datetime = new Date();
+		datetime = datetime.toISOString().slice(0, 10);
+
+		let SP = `
+    insert 
+    into 
+    public.review
+    (review_id, writer_id, destination_id, rating, content, date, transaction_id)
+    values 
+    (
+    CONCAT('R', (select nextval('review_id_sequence'))),
+    '${userId}',
+    (select project_id from public.transaction where transaction_id = '${data.transaction_id}'),
+    ${data.star},
+    '${data.description}',
+    '${datetime}',
+    '${data.transaction_id}'
+    )
+    `;
+
+		console.log(SP);
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Insert Review.");
+		}
+	}
 };
