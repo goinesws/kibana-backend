@@ -63,6 +63,51 @@ module.exports = class User {
 		return result[0];
 	}
 
+	async login(username_email, password) {
+		let SP = `
+		select 
+		(select 
+		 case 
+		 when count(*) = 1
+		 then true
+		 else false
+		 end
+		 as is_freelancer
+		 from public.freelancer where user_id = 
+		(select client_id from public.client where username = '${username_email}' or email = '${username_email}')),
+		(select 
+		 case 
+		 when count(*) = 1 
+		 then true 
+		 else false
+		 end 
+		 as is_connected_bank
+		 from public.bank_information where user_id = 
+		(select client_id from public.client where username = '${username_email}' or email = '${username_email}')),
+		profile_image as profile_image_url,
+		username,
+		name,
+		client_id as id,
+		(select freelancer_id from public.freelancer where user_id = 
+		(select client_id from public.client where username = '${username_email}' or email = '${username_email}'))
+		from 
+		public.client
+		where
+		(username = '${username_email}'
+		or
+		email = '${username_email}')
+		and 
+		password = '${password}';`;
+
+		try {
+			let result = await db.any(SP);
+
+			return result[0];
+		} catch (error) {
+			return new Error("Proses Login gagal");
+		}
+	}
+
 	async registerAsClient(email, username, name, phone, password) {
 		// Insert ke DB
 		let SP = `insert into public.client (client_id, email, password, name, phone_number) values ('${username}', '${email}', '${password}', '${name}', '${phone}');`;

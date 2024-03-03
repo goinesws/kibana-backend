@@ -4,33 +4,50 @@ const User = require("../models/userModel");
 const Client = require("../models/clientModel.js");
 const Freelancer = require("../models/freelancerModel.js");
 
+// done refactor
 app.loginFunction = async (req, res) => {
 	const username = req.body.username_email;
 	const password = req.body.password;
 
 	const userInstance = new User();
-	let login_info = await userInstance.getLoginInfo(username, password);
+	// let login_info = await userInstance.getLoginInfo(username, password);
 
-	let failed = false;
-	let curr_client_id = "";
-	if (login_info == null || login_info == undefined) {
-		failed = true;
-	} else {
-		curr_client_id = await userInstance.getClientID(username);
-	}
+	// let failed = false;
+	// let curr_client_id = "";
+	// if (login_info == null || login_info == undefined) {
+	// 	failed = true;
+	// } else {
+	// 	curr_client_id = await userInstance.getClientID(username);
+	// }
+
+	let login_info = await userInstance.login(username, password);
 
 	result = {};
 
-	if (failed) {
+	console.log(login_info);
+
+	if (
+		login_info instanceof Error ||
+		login_info == null ||
+		login_info == undefined
+	) {
 		result.error_schema = { error_code: 999, error_message: "Login Gagal." };
 		result.output_schema = {};
 	} else {
+		req.session.client_id = login_info.id;
+		req.session.is_freelancer = login_info.is_freelancer;
+		req.session.freelancer_id = login_info.freelancer_id;
+
+		// remove freelancer_id dari login_info
+		delete login_info["freelancer_id"];
+
+		console.log(req.session.is_freelancer);
+		console.log(req.session.freelancer_id);
+		console.log(req.session.client_id);
+
 		result.error_schema = { error_code: 200, error_message: "Sukses." };
 		result.output_schema = login_info;
 		result.output_schema.token = req.session.id;
-		req.session.client_id = curr_client_id;
-		req.session.is_freelancer = login_info.is_freelancer;
-		req.session.freelancer_id = login_info.freelancer_id;
 	}
 
 	res.send(result);
@@ -68,6 +85,7 @@ app.registerFunction = async (req, res) => {
 	res.send(result);
 };
 
+// pindah ke client controller
 app.registerFreelancerFunction = async (req, res) => {
 	const freelancer = req.body.freelancer;
 	const username = req.body.username;
