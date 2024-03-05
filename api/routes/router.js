@@ -16,6 +16,7 @@ const transactionController = require("../controllers/transactionController");
 
 const multer = require("multer");
 
+const { authorize, listFiles, uploadFile } = require('../models/googleModel');
 
 //storage for file uploads
 const storage = multer.memoryStorage();
@@ -165,63 +166,37 @@ router.post("/api/review/service", reviewController.insertReviewService);
 //transaction related
 router.get("/api/transaction/invoice/:transactionId", transactionController.getTransactionInvoice);
 
+router.post('/test1', upload.fields([{ name: 'portfolio', maxCount: 1 }]), (req, res) => {
+	try {
+		// authorize()
 
-
-
-router.post('/test', async (req, res) => {
-	
-	const drive = google.drive({version: 'v3', auth: authClient});
-  const res1 = await drive.files.list({
-    pageSize: 10,
-    fields: 'nextPageToken, files(id, name)',
+		authorize()
+		.then((auth) => {
+			if(req.files && req.files["portfolio"]) {
+				const image = req.files["portfolio"][0];
+				return uploadFile(auth, image);
+			} else {
+				console.log("GADA PORTO")
+			}
+			
+		})
+		// .then(listFiles)
+		.then((resultCode) => {
+			// Handle the result code
+			console.log('Function completed with result code:', resultCode);
+		  })
+		.catch((err) => {
+			console.error('Error:', err);
+		});
+	  // Call the function from the controller
+	//   const result = await transactionController.getTransactionInvoice(req.params.transactionId);
+  
+	  // Handle the result and send the response
+	  res.status(200);
+	} catch (error) {
+	  console.error('Error:', error);
+	  res.status(500).json({ error: 'Internal Server Error' });
+	}
   });
-  const files = res.data.files;
-  if (files.length === 0) {
-    console.log('No files found.');
-    return;
-  }
-
-  console.log('Files:');
-  files.map((file) => {
-    console.log(`${file.name} (${file.id})`);
-  });
-
-});
-
-const credentials = JSON.parse(fs.readFileSync('C:/Users/lenovo/kibana/credentials.json'));
-const { client_secret, client_id, redirect_uris } = credentials.installed;
-const oAuth2Client = new google.auth.OAuth2(client_id, client_secret, redirect_uris[0]);
-
-// Load the user's token from the token.json file
-const token = fs.readFileSync('path/to/your/token.json');
-oAuth2Client.setCredentials(JSON.parse(token));
-
-// Example route to upload a file to Google Drive
-app.post('/upload', upload.single('file'), async (req, res) => {
-  try {
-    const drive = google.drive({ version: 'v3', auth: oAuth2Client });
-
-    const fileMetadata = {
-      name: req.file.originalname,
-    };
-
-    const media = {
-      mimeType: req.file.mimetype,
-      body: req.file.buffer,
-    };
-
-    const response = await drive.files.create({
-      resource: fileMetadata,
-      media: media,
-      fields: 'id',
-    });
-
-    res.json({ fileId: response.data.id });
-  } catch (error) {
-    console.error('Error uploading file:', error.message);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
 
 module.exports = router;
