@@ -6,6 +6,24 @@ const Freelancer = require("../models/freelancerModel");
 const Review = require("../models/reviewModel");
 
 module.exports = class Task {
+  async getAllTaskDetail(task_id) {
+    let SP = `select 
+      task_id,
+      sub_category_id,
+      client_id,
+      freelancer_id
+      name,
+      description,
+      price,
+      difficulty,
+      tags,
+      TO_CHAR(created_date, 'DD Mon YYYY') from task where task_id = '${task_id}'`;
+
+    let result = await db.any(SP);
+
+    return result;
+  }
+  
   async getTaskList(headers) {
     const searchText = headers['search_text'];
     const subcategory = headers['sub_category'];

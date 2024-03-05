@@ -48,6 +48,7 @@ app.loginFunction = async (req, res) => {
 		result.error_schema = { error_code: 200, error_message: "Sukses." };
 		result.output_schema = login_info;
 		result.output_schema.token = req.session.id;
+		req.session.username = login_info.username;
 	}
 
 	res.send(result);

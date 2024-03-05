@@ -11,6 +11,45 @@ const { v4: uuidv4 } = require("uuid");
 class Service {
 	constructor() {}
 
+  async getAllServiceDetail(service_id) {
+		try {
+			var SP = `select service_id,
+      subcategory_id,
+      freelancer_id,
+      name,
+      description,
+      tags, price, working_time,
+      images,
+      revision_count,
+      is_active,
+      TO_CHAR(created_date, 'DD Mon YYYY') from service where service_id = '${service_id}'`;
+			const result = await db.any(SP);
+			return result[0];
+		} catch (error) {
+			throw new Error("Failed to fetch service");
+		}
+	}
+
+  async getAdditionalData(service_id) {
+		try {
+			var SP = `SELECT 
+          question as title
+        FROM
+          requirement
+        JOIN
+          additionalInfo ON additionalInfo.additional_info_id = requirement.additional_info_id
+        WHERE
+          service_id = '${service_id}'
+        AND
+          is_true = TRUE`
+      ;
+			const result = await db.any(SP);
+			return result;
+		} catch (error) {
+			throw new Error("Failed to fetch service");
+		}
+	}
+
 	async getServiceOwner(service_id) {
 		try {
 			var SP = `select freelancer_id from service where service_id = '${service_id}'`;
