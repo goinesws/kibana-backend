@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const FormData = require("form-data");
 
 module.exports = class User {
+	// old login
 	async getLoginInfo(username, password) {
 		// Kalau sempet ini akan di rewrite
 		// SP buat get client ID
@@ -63,6 +64,7 @@ module.exports = class User {
 		return result[0];
 	}
 
+	// ini dipake untuk login
 	async login(username_email, password) {
 		let SP = `
 		select 
@@ -136,6 +138,47 @@ module.exports = class User {
 		};
 
 		return result;
+	}
+
+	// ini dipake untuk register
+	async register(email, username, name, phone, password) {
+		// buat di SP insert data ke DB
+		let SP_insert = `
+		insert 
+		into
+		public.client
+		(client_id, email, password, name, phone_number, profile_image, username)
+		values
+		(CONCAT('CL', (select nextval('client_id_sequence'))), '${email}', '${password}', '${name}', '${phone}', '', '${username}');
+		`;
+
+		// run SP insert
+		try {
+			let insert_result = await db.any(SP_insert);
+		} catch (error) {
+			return new Error("Gagal Insert.");
+		}
+
+		// buat SP get data buat di return
+
+		let SP_return = `
+			select 
+			profile_image as profile_image_url,
+			username,
+			name,
+			client_id as id
+			from
+			public.client
+			where
+			username = '${username}';
+		`;
+		try {
+			let return_result = await db.any(SP_return);
+
+			return return_result[0];
+		} catch (error) {
+			return new Error("Gagal Get.");
+		}
 	}
 
 	async registerAsFreelancer(freelancer, username) {
