@@ -53,4 +53,6 @@ module.exports = class Client {
 
 		return result;
 	}
+
+	async register() {}
 };

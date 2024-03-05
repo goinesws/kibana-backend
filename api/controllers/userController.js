@@ -53,6 +53,7 @@ app.loginFunction = async (req, res) => {
 	res.send(result);
 };
 
+// done refactor
 app.registerFunction = async (req, res) => {
 	const email = req.body.email;
 	const username = req.body.username;
@@ -60,8 +61,36 @@ app.registerFunction = async (req, res) => {
 	const phone = req.body.phone_number;
 	const password = req.body.password;
 
+	// old Code
+	// output_schema = await userInstance.registerAsClient(
+	// 	email,
+	// 	username,
+	// 	name,
+	// 	phone,
+	// 	password
+	// );
+
+	// result = {};
+
+	// if (output_schema == null) {
+	// 	result.error_schema = {
+	// 		error_code: 999,
+	// 		error_message: "Registrasi Gagal.",
+	// 	};
+	// 	result.output_schema = {};
+	// } else {
+	// 	result.error_schema = { error_code: 200, error_message: "Sukses." };
+	// 	result.output_schema = output_schema;
+	// }
+
+	// new Code
+	let result = {};
+
+	result.error_schema = {};
+	result.output_schema = {};
+
 	const userInstance = new User();
-	output_schema = await userInstance.registerAsClient(
+	let register_result = await userInstance.register(
 		email,
 		username,
 		name,
@@ -69,9 +98,7 @@ app.registerFunction = async (req, res) => {
 		password
 	);
 
-	result = {};
-
-	if (output_schema == null) {
+	if (register_result instanceof Error) {
 		result.error_schema = {
 			error_code: 999,
 			error_message: "Registrasi Gagal.",
@@ -79,7 +106,10 @@ app.registerFunction = async (req, res) => {
 		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses." };
-		result.output_schema = output_schema;
+		result.output_schema = register_result;
+		result.output_schema.is_freelancer = false;
+		result.output_schema.is_connected_bank = false;
+		result.output_schema.token = req.session.id;
 	}
 
 	res.send(result);
