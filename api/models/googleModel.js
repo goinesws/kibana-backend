@@ -28,8 +28,14 @@ const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
  */
 async function loadSavedCredentialsIfExist() {
   try {
+		console.log("2")
+
     const content = await fs.readFile(TOKEN_PATH);
+		console.log("3")
+
     const credentials = JSON.parse(content);
+		console.log("4")
+
     return google.auth.fromJSON(credentials);
   } catch (err) {
     return null;
@@ -61,13 +67,22 @@ async function saveCredentials(client) {
  */
 async function authorize() {
   let client = await loadSavedCredentialsIfExist();
+  console.log("author")
+
   if (client) {
+		console.log("satu")
+
+    console.log(client)
     return client;
   }
+  console.log("2")
+
   client = await authenticate({
     scopes: SCOPES,
     keyfilePath: CREDENTIALS_PATH,
   });
+  console.log("dua")
+
   if (client.credentials) {
     await saveCredentials(client);
   }
@@ -107,21 +122,29 @@ async function uploadFile(authClient, image) {
         body: new stream.PassThrough().end(image.buffer),
       };
 
-      console.log(image.originalname)
-      console.log(image.buffer)
-      const driveRes = drive.files.create({
+      // console.log(image.originalname)
+      // console.log(image.buffer)
+      const driveRes = await drive.files.create({
         auth: authClient,
         resource: fileMetadata,
         media: media,
       });
 
       console.log('File uploaded to Google Drive:', driveRes.data);
+      const file_id = driveRes.data.id;
 
-    const res = await drive.files.list({
-      pageSize: 10,
-      fields: 'nextPageToken, files(id, name)',
-    });
-    console.log("done")
+      // Set the visibility to 'anyone with the link'
+      const changePermission = await drive.permissions.create({
+        fileId: file_id,
+        requestBody: {
+          role: 'reader',
+          type: 'anyone',
+        },
+      });
+      console.log('permission changed to all');
+
+      console.log("done")
+      return file_id;
   }
 
 module.exports = {

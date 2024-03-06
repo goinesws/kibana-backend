@@ -169,10 +169,13 @@ router.get("/api/transaction/invoice/:transactionId", transactionController.getT
 router.post('/test1', upload.fields([{ name: 'portfolio', maxCount: 1 }]), (req, res) => {
 	try {
 		// authorize()
-
 		authorize()
 		.then((auth) => {
+		console.log("2 router")
+
 			if(req.files && req.files["portfolio"]) {
+		console.log("3 router")
+
 				const image = req.files["portfolio"][0];
 				return uploadFile(auth, image);
 			} else {
@@ -192,7 +195,8 @@ router.post('/test1', upload.fields([{ name: 'portfolio', maxCount: 1 }]), (req,
 	//   const result = await transactionController.getTransactionInvoice(req.params.transactionId);
   
 	  // Handle the result and send the response
-	  res.status(200);
+	  result = {};
+	  res.send(result);
 	} catch (error) {
 	  console.error('Error:', error);
 	  res.status(500).json({ error: 'Internal Server Error' });
