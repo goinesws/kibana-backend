@@ -168,22 +168,15 @@ router.get("/api/transaction/invoice/:transactionId", transactionController.getT
 
 router.post('/test1', upload.fields([{ name: 'portfolio', maxCount: 1 }]), (req, res) => {
 	try {
-		// authorize()
 		authorize()
 		.then((auth) => {
-		console.log("2 router")
-
 			if(req.files && req.files["portfolio"]) {
-		console.log("3 router")
-
 				const image = req.files["portfolio"][0];
 				return uploadFile(auth, image);
 			} else {
-				console.log("GADA PORTO")
+				console.log("No file has been uploaded")
 			}
-			
 		})
-		// .then(listFiles)
 		.then((resultCode) => {
 			// Handle the result code
 			console.log('Function completed with result code:', resultCode);
@@ -191,10 +184,6 @@ router.post('/test1', upload.fields([{ name: 'portfolio', maxCount: 1 }]), (req,
 		.catch((err) => {
 			console.error('Error:', err);
 		});
-	  // Call the function from the controller
-	//   const result = await transactionController.getTransactionInvoice(req.params.transactionId);
-  
-	  // Handle the result and send the response
 	  result = {};
 	  res.send(result);
 	} catch (error) {

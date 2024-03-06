@@ -4,7 +4,6 @@ const app = express();
 const multer = require('multer');
 const { google } = require('googleapis');
 const fs = require('fs').promises;
-const fs1 = require('fs');
 const path = require('path');
 const process = require('process');
 const {authenticate} = require('@google-cloud/local-auth');
@@ -67,21 +66,16 @@ async function saveCredentials(client) {
  */
 async function authorize() {
   let client = await loadSavedCredentialsIfExist();
-  console.log("author")
 
   if (client) {
-		console.log("satu")
-
     console.log(client)
     return client;
   }
-  console.log("2")
 
   client = await authenticate({
     scopes: SCOPES,
     keyfilePath: CREDENTIALS_PATH,
   });
-  console.log("dua")
 
   if (client.credentials) {
     await saveCredentials(client);
@@ -111,15 +105,15 @@ async function listFiles(authClient) {
   });
 }
 
-async function uploadFile(authClient, image) {
+async function uploadFile(authClient, file) {
     const drive = google.drive({version: 'v3', auth: authClient});
     
     const fileMetadata = {
-        name: image.originalname,
+        name: file.originalname,
       };
   
       const media = {
-        body: new stream.PassThrough().end(image.buffer),
+        body: new stream.PassThrough().end(file.buffer),
       };
 
       // console.log(image.originalname)

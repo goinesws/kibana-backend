@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const Freelancer = require("../models/freelancerModel.js");
 var multer = require("multer");
+const { authorize, listFiles, uploadFile } = require('../models/googleModel');
+
 
 app.getFreelancerDescription = async (req, res) => {
 	let result = {};
@@ -367,17 +369,26 @@ app.editFreelancerPortfolio = async (req, res) => {
 		let userId = req.session.client_id;
 		let freelancerInstance = new Freelancer();
 		let images = [];
-
-		images.push(
-			await freelancerInstance.addFreelancerImage(req.files["portfolio"])
-		);
-
-		console.log(images);
-		images = images.map((link) => link.replace(/"/g, ""));
+		const link = await authorize()
+			.then((auth) => {
+				if(req.files && req.files["portfolio"]) {
+					const file = req.files["portfolio"][0];
+					return uploadFile(auth, file);
+				} else {
+					console.log("No file has been uploaded")
+				}
+			})
+			.then((resultCode) => {
+				const file_link = 'https://drive.google.com/file/d/'+resultCode+'/preview?usp=embed_googleplus'; 
+				return file_link;
+			})
+			.catch((err) => {
+				console.error('Error:', err);
+			})
 
 		let port_result = await freelancerInstance.editFreelancerPortfolio(
 			userId,
-			images[0]
+			link
 		);
 
 		if (port_result instanceof Error) {
