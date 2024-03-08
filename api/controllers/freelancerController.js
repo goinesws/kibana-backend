@@ -316,23 +316,30 @@ app.editFreelancerCV = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	console.log(req.files);
-	console.log(req.body.data);
-
 	// cek session id ama x-token + cek if freelancer
 	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
 		let userId = req.session.client_id;
 		let freelancerInstance = new Freelancer();
-		let images = [];
-
-		images.push(await freelancerInstance.addFreelancerImage(req.files["cv"]));
-
-		console.log(images);
-		images = images.map((link) => link.replace(/"/g, ""));
+		const id = await authorize()
+			.then((auth) => {
+				if(req.files && req.files["cv"]) {
+					const file = req.files["cv"][0];
+					return uploadFile(auth, file);
+				} else {
+					console.log("No file has been uploaded")
+				}
+			})
+			.then((resultCode) => {
+				const id = resultCode; 
+				return id;
+			})
+			.catch((err) => {
+				console.error('Error:', err);
+			})
 
 		let cv_result = await freelancerInstance.editFreelancerCV(
 			userId,
-			images[0]
+			id
 		);
 
 		if (cv_result instanceof Error) {
@@ -368,8 +375,7 @@ app.editFreelancerPortfolio = async (req, res) => {
 	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
 		let userId = req.session.client_id;
 		let freelancerInstance = new Freelancer();
-		let images = [];
-		const link = await authorize()
+		const id = await authorize()
 			.then((auth) => {
 				if(req.files && req.files["portfolio"]) {
 					const file = req.files["portfolio"][0];
@@ -379,8 +385,8 @@ app.editFreelancerPortfolio = async (req, res) => {
 				}
 			})
 			.then((resultCode) => {
-				const file_link = 'https://drive.google.com/file/d/'+resultCode+'/preview?usp=embed_googleplus'; 
-				return file_link;
+				const id = resultCode; 
+				return id;
 			})
 			.catch((err) => {
 				console.error('Error:', err);
@@ -388,7 +394,7 @@ app.editFreelancerPortfolio = async (req, res) => {
 
 		let port_result = await freelancerInstance.editFreelancerPortfolio(
 			userId,
-			link
+			id
 		);
 
 		if (port_result instanceof Error) {

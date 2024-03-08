@@ -27,13 +27,9 @@ const CREDENTIALS_PATH = path.join(process.cwd(), 'credentials.json');
  */
 async function loadSavedCredentialsIfExist() {
   try {
-		console.log("2")
-
     const content = await fs.readFile(TOKEN_PATH);
-		console.log("3")
 
     const credentials = JSON.parse(content);
-		console.log("4")
 
     return google.auth.fromJSON(credentials);
   } catch (err) {
@@ -105,6 +101,54 @@ async function listFiles(authClient) {
   });
 }
 
+async function getPreviewLink(id) {
+  let link = 'https://drive.google.com/file/d/'+id+'/preview '; 
+  return link;
+}
+
+async function getBlob(id) {
+  try {
+    // Fetch file content from Google Drive.
+    const response = await fetch('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media');
+    
+    // Ensure the request was successful.
+    if (!response.ok) {
+      throw new Error('Tidak menemukan file');
+    }
+
+    // Convert the response to a Blob.
+    const blob = await response.blob();
+
+    return blob;
+  } catch (error) {
+    console.error('Error:', error.message);
+    throw error;
+  }
+}
+
+async function getDownloadLink(id) {
+  let link = 'https://drive.google.com/uc?id='+id; 
+  return link;
+}
+
+async function getFileName(authClient, id) {
+  try {
+    // Fetch file metadata from Google Drive.
+    const drive = google.drive({ version: 'v3', auth: authClient });
+    const fileInfo = await drive.files.get({
+      fileId: id,
+    });
+
+    // Get the file name from the metadata.
+    const fileName = fileInfo.data.name;
+
+    return fileName;
+  } catch (error) {
+    console.error('Error:', error.message);
+    throw error;
+  }
+}
+
 async function uploadFile(authClient, file) {
     const drive = google.drive({version: 'v3', auth: authClient});
     
@@ -147,4 +191,8 @@ module.exports = {
     uploadFile,
     loadSavedCredentialsIfExist,
     saveCredentials,
+    getFileName,
+    getBlob,
+    getDownloadLink,
+    getPreviewLink
   };
