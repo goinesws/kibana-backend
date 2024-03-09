@@ -1,0 +1,33 @@
+{
+  "cv": "",
+  "portfolio": "",
+  "education_history": [
+    {
+      "degree": "Bachelor of Science",
+      "major": "Science Economics",
+      "university": "University of Pennsylvania",
+      "country": "USA",
+      "graducation_year": "2013"
+    },
+    {
+      "degree": "Bachelor of Science",
+      "major": "Science Economics",
+      "university": "University of Pennsylvania",
+      "country": "USA",
+      "graducation_year": "2013"
+    },
+    {
+      "degree": "Bachelor of Science",
+      "major": "Science Economics",
+      "university": "University of Pennsylvania",
+      "country": "USA",
+      "graducation_year": "2013"
+    }
+  ],
+  "skills": [
+    "cuci",
+    "masak",
+    "design"
+  ],
+  "description": "Seorang freelancer abangku"
+}

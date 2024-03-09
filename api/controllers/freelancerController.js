@@ -2,8 +2,7 @@ const express = require("express");
 const app = express();
 const Freelancer = require("../models/freelancerModel.js");
 var multer = require("multer");
-const { authorize, listFiles, uploadFile } = require('../models/googleModel');
-
+const { authorize, listFiles, uploadFile } = require("../models/googleModel");
 
 app.getFreelancerDescription = async (req, res) => {
 	let result = {};
@@ -322,25 +321,22 @@ app.editFreelancerCV = async (req, res) => {
 		let freelancerInstance = new Freelancer();
 		const id = await authorize()
 			.then((auth) => {
-				if(req.files && req.files["cv"]) {
+				if (req.files && req.files["cv"]) {
 					const file = req.files["cv"][0];
 					return uploadFile(auth, file);
 				} else {
-					console.log("No file has been uploaded")
+					console.log("No file has been uploaded");
 				}
 			})
 			.then((resultCode) => {
-				const id = resultCode; 
+				const id = resultCode;
 				return id;
 			})
 			.catch((err) => {
-				console.error('Error:', err);
-			})
+				console.error("Error:", err);
+			});
 
-		let cv_result = await freelancerInstance.editFreelancerCV(
-			userId,
-			id
-		);
+		let cv_result = await freelancerInstance.editFreelancerCV(userId, id);
 
 		if (cv_result instanceof Error) {
 			result.error_schema = {
@@ -377,20 +373,20 @@ app.editFreelancerPortfolio = async (req, res) => {
 		let freelancerInstance = new Freelancer();
 		const id = await authorize()
 			.then((auth) => {
-				if(req.files && req.files["portfolio"]) {
+				if (req.files && req.files["portfolio"]) {
 					const file = req.files["portfolio"][0];
 					return uploadFile(auth, file);
 				} else {
-					console.log("No file has been uploaded")
+					console.log("No file has been uploaded");
 				}
 			})
 			.then((resultCode) => {
-				const id = resultCode; 
+				const id = resultCode;
 				return id;
 			})
 			.catch((err) => {
-				console.error('Error:', err);
-			})
+				console.error("Error:", err);
+			});
 
 		let port_result = await freelancerInstance.editFreelancerPortfolio(
 			userId,

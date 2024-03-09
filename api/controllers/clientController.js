@@ -2,6 +2,9 @@ const express = require("express");
 const app = express();
 const Client = require("../models/clientModel.js");
 const Freelancer = require("../models/freelancerModel.js");
+const Google = require("../models/googleModel.js");
+var multer = require("multer");
+const { authorize, listFiles, uploadFile } = require("../models/googleModel");
 
 app.getClientReview = async (req, res) => {
 	let result = {};
@@ -51,6 +54,97 @@ app.getClientTask = async (req, res) => {
 	res.send(result);
 };
 
-app.registerAsFreelancer = async (req, res) => {};
+app.registerAsFreelancer = async (req, res) => {
+	let result = {};
+
+	result.error_schema = {};
+	result.output_schema = {};
+
+	if (req.session.id == req.get("X-Token")) {
+		// get file cv
+		let cv_id = "";
+		let cv_url = "";
+		if (req.files["cv"]) {
+			cv_id = await authorize()
+				.then((auth) => {
+					if (req.files && req.files["cv"]) {
+						const file = req.files["cv"][0];
+						return uploadFile(auth, file);
+					} else {
+						console.log("No file has been uploaded");
+					}
+				})
+				.then((resultCode) => {
+					const cv_id = resultCode;
+					return cv_id;
+				})
+				.catch((err) => {
+					console.error("Error:", err);
+				});
+
+			cv_url = await Google.getPreviewLink(cv_id);
+		}
+
+		// get portfolio
+		let port_id = "";
+		let port_url = "";
+		if (req.files["portfolio"]) {
+			port_id = await authorize()
+				.then((auth) => {
+					if (req.files && req.files["portfolio"]) {
+						const file = req.files["portfolio"][0];
+						return uploadFile(auth, file);
+					} else {
+						console.log("No file has been uploaded");
+					}
+				})
+				.then((resultCode) => {
+					const port_id = resultCode;
+					return port_id;
+				})
+				.catch((err) => {
+					console.error("Error:", err);
+				});
+
+			port_url = await Google.getPreviewLink(port_id);
+		}
+
+		// get data and regsiter via clientModels
+
+		const data = JSON.parse(req.body.data);
+		const userID = req.session.client_id;
+		console.log(data);
+
+		let clientInstance = new Client();
+		let reg_result = await clientInstance.register(
+			data,
+			cv_url,
+			port_url,
+			userID
+		);
+
+		if (reg_result instanceof Error) {
+			result.error_schema = {
+				error_code: 999,
+				error_message: "Registrasi Gagal.",
+			};
+			result.output_schema = {};
+		} else {
+			result.error_schema = {
+				error_code: 200,
+				error_message: "Sukses.",
+			};
+			result.output_schema = {};
+		}
+	} else {
+		result.error_schema = {
+			error_code: 403,
+			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
+		};
+		result.output_schema = {};
+	}
+
+	res.send(result);
+};
 
 module.exports = app;

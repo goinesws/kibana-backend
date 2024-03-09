@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../../db");
-const dotenv = require('dotenv');
-const { google } = require('googleapis');
-const fs = require('fs');
+const dotenv = require("dotenv");
+const { google } = require("googleapis");
+const fs = require("fs");
 const userController = require("../controllers/userController");
 const taskController = require("../controllers/taskController");
 const serviceController = require("../controllers/serviceController");
@@ -16,7 +16,7 @@ const transactionController = require("../controllers/transactionController");
 
 const multer = require("multer");
 
-const { authorize, listFiles, uploadFile } = require('../models/googleModel');
+const { authorize, listFiles, uploadFile } = require("../models/googleModel");
 
 //storage for file uploads
 const storage = multer.memoryStorage();
@@ -35,7 +35,14 @@ router.get("/", async (req, res) => {
 // User & Auth Related
 router.post("/login", userController.loginFunction);
 router.post("/register", userController.registerFunction);
-router.post("/register-freelancer", userController.registerFreelancerFunction);
+router.post(
+	"/register-freelancer",
+	upload.fields([
+		{ name: "cv", maxCount: 1 },
+		{ name: "portfolio", maxCount: 1 },
+	]),
+	clientController.registerAsFreelancer
+);
 router.post("/logout", userController.logoutFunction);
 
 // Task Related
@@ -162,34 +169,40 @@ router.post("/api/review/client", reviewController.insertReviewClient);
 router.post("/api/review/freelancer", reviewController.insertReviewFreelancer);
 router.post("/api/review/service", reviewController.insertReviewService);
 
-
 //transaction related
-router.get("/api/transaction/invoice/:transactionId", transactionController.getTransactionInvoice);
+router.get(
+	"/api/transaction/invoice/:transactionId",
+	transactionController.getTransactionInvoice
+);
 
-router.post('/test1', upload.fields([{ name: 'portfolio', maxCount: 1 }]), (req, res) => {
-	try {
-		authorize()
-		.then((auth) => {
-			if(req.files && req.files["portfolio"]) {
-				const image = req.files["portfolio"][0];
-				return uploadFile(auth, image);
-			} else {
-				console.log("No file has been uploaded")
-			}
-		})
-		.then((resultCode) => {
-			// Handle the result code
-			console.log('Function completed with result code:', resultCode);
-		  })
-		.catch((err) => {
-			console.error('Error:', err);
-		});
-	  result = {};
-	  res.send(result);
-	} catch (error) {
-	  console.error('Error:', error);
-	  res.status(500).json({ error: 'Internal Server Error' });
+router.post(
+	"/test1",
+	upload.fields([{ name: "portfolio", maxCount: 1 }]),
+	(req, res) => {
+		try {
+			authorize()
+				.then((auth) => {
+					if (req.files && req.files["portfolio"]) {
+						const image = req.files["portfolio"][0];
+						return uploadFile(auth, image);
+					} else {
+						console.log("No file has been uploaded");
+					}
+				})
+				.then((resultCode) => {
+					// Handle the result code
+					console.log("Function completed with result code:", resultCode);
+				})
+				.catch((err) => {
+					console.error("Error:", err);
+				});
+			result = {};
+			res.send(result);
+		} catch (error) {
+			console.error("Error:", error);
+			res.status(500).json({ error: "Internal Server Error" });
+		}
 	}
-  });
+);
 
 module.exports = router;
