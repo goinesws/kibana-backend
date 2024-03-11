@@ -33,17 +33,17 @@ router.get("/", async (req, res) => {
 });
 
 // User & Auth Related
-router.post("/login", userController.loginFunction);
-router.post("/register", userController.registerFunction);
+router.post("/api/login", userController.loginFunction);
+router.post("/api/register", userController.registerFunction);
 router.post(
-	"/register-freelancer",
+	"/api/register-freelancer",
 	upload.fields([
 		{ name: "cv", maxCount: 1 },
 		{ name: "portfolio", maxCount: 1 },
 	]),
 	clientController.registerAsFreelancer
 );
-router.post("/logout", userController.logoutFunction);
+router.get("/api/logout", userController.logoutFunction);
 
 // Task Related
 router.get("/api/task/new/:categoryId", taskController.getNewTaskByCategory);
@@ -57,6 +57,20 @@ router.get(
 );
 router.post("/api/task/list", taskController.getTaskList);
 router.get("/api/task/detail/:taskId", taskController.getTaskDetails);
+router.post("/api/task/create", taskController.createTask);
+router.get("/api/task/owned", taskController.getOwnedTask);
+router.get("/api/task/owned/:taskId", taskController.getOwnedTaskDetails);
+router.get(
+	"/api/task/:taskId/freelancer-list",
+	taskController.getRegisteredFreelancer
+);
+router.put("/api/task/:taskId/delete", taskController.deleteTask);
+router.get("/api/task/history", taskController.getTaskHistory);
+router.get("/api/task/history/:taskId", taskController.getTaskHistoryDetails);
+router.post(
+	"/api/task/:taskId/choose-freelancer",
+	taskController.chooseFreelancer
+);
 
 // Service Related
 router.get("/api/service/new/:categoryId", serviceController.getNewService);

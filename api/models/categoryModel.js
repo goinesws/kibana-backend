@@ -1,18 +1,18 @@
 const express = require("express");
 const db = require("../../db");
-const Subcategory = require('../models/subcategoryModel')
+const Subcategory = require("../models/subcategoryModel");
 
 module.exports = class Category {
-  async getAllCategoriesForTask() {
-    let SPGetCategories = `select category_id as id, name, image from public.category`;
+	async getAllCategoriesForTask() {
+		let SPGetCategories = `select category_id as id, name, image from public.category`;
 
-    let result = await db.any(SPGetCategories);
+		let result = await db.any(SPGetCategories);
 
-    return result;
-  }
+		return result;
+	}
 
-  async getAllCategorySubcategory() {
-    let SPGetCategories = `
+	async getAllCategorySubcategory() {
+		let SPGetCategories = `
     select category.category_id as id, category.name as name, category.image as image_url, 
         COALESCE(
             (SELECT COUNT(service.subcategory_id) 
@@ -34,38 +34,53 @@ module.exports = class Category {
             category.category_id, category.name, category.image
       ORDER BY id asc`;
 
-    let result = await db.any(SPGetCategories);
+		let result = await db.any(SPGetCategories);
 
-    return result;
-  }
+		return result;
+	}
 
-  async getAllCategorySubcategoryTask() {
-    const subcatInstance = new Subcategory();
-    let result = await Category.getAllCategoriesForTask();
+	async getAllCategorySubcategoryTask() {
+		let SP = `
+    select 
+    c.category_id as id,
+    c.name as name,
+    c.image as image_url,
+    (
+      select count(*) 
+      from 
+      public.task
+      where 
+      sub_category_id in
+      (
+        select (subcategory_id)
+        from
+        public.subcategory
+        where
+        category_id = c.category_id
+      )
+    ) as task_amount,
+    (
+      select json_agg(t)
+      from 
+      (
+        select subcategory_id as id, name
+        from public.subcategory
+        where
+        category_id = c.category_id
+      ) t
+    ) as sub_categories
+    from
+    public.category c
+    `;
 
-    // console.log(result);
-    if (result.length == 0) {
-      return null;
-    }
-    // get subcategories
-    // get all the subcategories for each category
-    for (let i = 0; i < result.length; i++) {
-      let subcatResult = await subcatInstance.getSubcatLiteByCategoryID(result[i].id);
+		try {
+			let result = db.any(SP);
 
-      // console.log('Subcat Result');
-      // console.log(subcatResult);
-      // get amount based on subcat
-      let count = 0;
-      for (let j = 0; j < subcatResult.length; j++) {       
-        let countResult = await subcatInstance.getSubcatCountByID(subcatResult[j].id);
-        // console.log('Count Result di Task Model');
-        // console.log(countResult.count);
-        count +=  parseInt(countResult.count);
-      }
-      result[i].task_amount = count;
-      result[i].sub_categories = subcatResult;
-    }
+			return result;
+		} catch (error) {
+			return new Error("Error Get Data.");
+		}
 
-    return result;
-  }
+		return result;
+	}
 };
