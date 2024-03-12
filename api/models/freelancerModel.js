@@ -246,7 +246,7 @@ module.exports = class Freelancer {
 		freelancer_id = (select frelancer_id from public.freelancer where userId = '${userId}')
 		`;
 
-		let result = await db.any(SP_insert);
+		let result = await db.any(SP_edit);
 
 		return result;
 	}
@@ -332,6 +332,50 @@ module.exports = class Freelancer {
 			return result;
 		} catch (error) {
 			return new Error("Edit Gagal");
+		}
+	}
+
+	async createFreelancer(userId, description, cv, portfolio, skills) {
+		let SP = `
+		insert 
+		into
+		public.freelancer
+		(freelancer_id, user_id, description, cv, portfolio, skills)
+		values
+		(
+			CONCAT('FL', (select nextval('freelancer_id_sequence'))),
+			'${userId}',
+			'${description}',
+			'${cv}',
+			'${portfolio}',
+			'{${skills}}'
+		)
+		`;
+
+		try {
+			let result = await db.any(SP);
+			return result;
+		} catch (error) {
+			return new Error("Gagal Insert.");
+		}
+	}
+
+	async insertFreelancerEducation(userId, education) {
+		let SP = `
+		insert 
+		into
+		public.education
+		(education_id, freelancer_id, degree, major, university, country, year)
+		values
+		(CONCAT('EDU', (select nextval('education_id_sequence'))), 
+		(select freelancer_id from public.freelancer where user_id = '${userId}' ), 
+		'${education.degree}', '${education.major}', '${education.university}', '${education.country}', ${education.graducation_year});`;
+
+		try {
+			let result = await db.any(SP);
+			return result;
+		} catch (error) {
+			return new Error("Gagal Insert.");
 		}
 	}
 };

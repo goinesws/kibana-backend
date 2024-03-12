@@ -111,6 +111,7 @@ app.registerFunction = async (req, res) => {
 		result.output_schema.is_freelancer = false;
 		result.output_schema.is_connected_bank = false;
 		result.output_schema.token = req.session.id;
+		req.session.client_id = register_result.id;
 	}
 
 	res.send(result);
