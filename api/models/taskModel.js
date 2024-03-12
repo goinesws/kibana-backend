@@ -6,6 +6,18 @@ const Freelancer = require("../models/freelancerModel");
 const Review = require("../models/reviewModel");
 
 module.exports = class Task {
+	async getNewTask() {
+		let SP = ``;
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
+	}
+
 	async getAllTaskDetail(task_id) {
 		let SP = `select 
       task_id,
@@ -47,7 +59,11 @@ module.exports = class Task {
 			const budgetStart = budgetObject.budget_start;
 			const budgetEnd = budgetObject.budget_end;
 
-			if ((searchText !== "" && searchText) || (subcategory !== "" && subcategory)) SP += ` AND`;
+			if (
+				(searchText !== "" && searchText) ||
+				(subcategory !== "" && subcategory)
+			)
+				SP += ` AND`;
 			else SP += ` WHERE`;
 			if (budget.budget_end !== null) {
 				SP += ` price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
@@ -57,7 +73,11 @@ module.exports = class Task {
 		}
 
 		if (difficulty !== "" && difficulty) {
-			if ((searchText !== "" && searchText) || (subcategory !== "" && subcategory) || (budget !== "" && budget))
+			if (
+				(searchText !== "" && searchText) ||
+				(subcategory !== "" && subcategory) ||
+				(budget !== "" && budget)
+			)
 				SP += ` AND`;
 			else SP += ` WHERE`;
 			SP += ` difficulty = '${difficulty}'`;

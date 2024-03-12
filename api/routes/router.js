@@ -46,6 +46,7 @@ router.post(
 router.get("/api/logout", userController.logoutFunction);
 
 // Task Related
+router.get("/api/task/new", taskController.getNewTask);
 router.get("/api/task/new/:categoryId", taskController.getNewTaskByCategory);
 router.get(
 	"/api/task/category/:categoryId/detail",
@@ -188,6 +189,7 @@ router.get(
 	"/api/transaction/invoice/:transactionId",
 	transactionController.getTransactionInvoice
 );
+router.get("/api/transaction/invoice/:transactionId/completed");
 
 router.post(
 	"/test1",
