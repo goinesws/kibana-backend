@@ -33,21 +33,21 @@ module.exports = class Task {
 
     let SP = `SELECT task_id as id, name, description, tags, deadline as due_date, difficulty, price FROM public.task`;
 
-    if (searchText !== "") {
+    if (searchText !== "" && searchText) {
       SP += ` WHERE (name || description ILIKE '%${searchText}%'
       OR '${searchText}' ILIKE ANY (tags))`;
     }
-    if (subcategory !== "") {
+    if (subcategory !== "" && subcategory) {
       if(searchText!=="") SP +=` AND`
       else SP += ` WHERE`
       SP += ` sub_category_id = '${subcategory}'`;
     }
-    if (budget !== "") {
+    if (budget !== "" && budget) {
       const budgetObject = JSON.parse(budget);
       const budgetStart = budgetObject.budget_start;
       const budgetEnd = budgetObject.budget_end;
 
-      if(searchText!=="" || subcategory!=="") SP +=` AND`
+      if((searchText!=="" && searchText) || (subcategory!=="" && subcategory)) SP +=` AND`
       else SP += ` WHERE`
       if (budget.budget_end !== null) {
         SP += ` price BETWEEN '${budgetStart}' AND '${budgetEnd}'`;
@@ -56,8 +56,8 @@ module.exports = class Task {
       }
     }
 
-    if (difficulty !== "") {
-      if(searchText!=="" || subcategory!=="" || budget!=="") SP +=` AND`
+    if (difficulty !== "" && difficulty) {
+      if((searchText!=="" && searchText) || (subcategory!=="" && subcategory) || (budget!=="" && budget)) SP +=` AND`
       else SP += ` WHERE`
       SP += ` difficulty = '${difficulty}'`;
     }
