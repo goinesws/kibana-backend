@@ -161,49 +161,59 @@ module.exports = class Task {
 	}
 
 	async getTaskDetails(taskId) {
-		let result = {};
-		// SP buat task details
-		let SPTaskDetails = `select task_id as id, name, tags, deadline as due_date, difficulty, price, description 
-    from public.task where "task_id" = '${taskId}';`;
+		// let result = {};
+		// // SP buat task details
+		// let SPTaskDetails = `select task_id as id, name, tags, deadline as due_date, difficulty, price, description
+		// from public.task where "task_id" = '${taskId}';`;
 
-		let temp_task_detail = await db.any(SPTaskDetails);
+		// let temp_task_detail = await db.any(SPTaskDetails);
 
-		result.task_detail = temp_task_detail[0];
+		// result.task_detail = temp_task_detail[0];
 
-		let SPGetClient = `select public.client.client_id as id, profile_image as profile_image_url, public.client.name from public.client 
-    join 
-    public.task 
-    on
-    public.client.client_id = public.task.client_id
-    and
-    public.task.task_id = '${taskId}';`;
+		// let SPGetClient = `select public.client.client_id as id, profile_image as profile_image_url, public.client.name from public.client
+		// join
+		// public.task
+		// on
+		// public.client.client_id = public.task.client_id
+		// and
+		// public.task.task_id = '${taskId}';`;
 
-		let temp_client = await db.any(SPGetClient);
+		// let temp_client = await db.any(SPGetClient);
 
-		result.client = temp_client;
+		// result.client = temp_client;
 
-		let temp_registered_freelancer = await Freelancer.getFreelancerByTaskID(
-			taskId
-		);
+		// let temp_registered_freelancer = await Freelancer.getFreelancerByTaskID(
+		// 	taskId
+		// );
 
-		result.registered_freelancer = temp_registered_freelancer;
+		// result.registered_freelancer = temp_registered_freelancer;
 
-		let temp_res_get_client_client_review_list =
-			await Review.getClientReviewByTaskID(taskId);
-		let temp_res_get_client_review_rating_amount =
-			await Review.getClientReviewRatingAmountByTaskID(taskId);
-		let temp_res_get_client_avg_rating =
-			await Review.getClientAvgRatingByTaskID(taskId);
+		// let temp_res_get_client_client_review_list =
+		// 	await Review.getClientReviewByTaskID(taskId);
+		// let temp_res_get_client_review_rating_amount =
+		// 	await Review.getClientReviewRatingAmountByTaskID(taskId);
+		// let temp_res_get_client_avg_rating =
+		// 	await Review.getClientAvgRatingByTaskID(taskId);
 
-		result.review = {};
+		// result.review = {};
 
-		result.review.average_rating =
-			temp_res_get_client_avg_rating.average_rating;
-		result.review.rating_amount =
-			temp_res_get_client_review_rating_amount.rating_amount;
-		result.review.review_list = temp_res_get_client_client_review_list;
+		// result.review.average_rating =
+		// 	temp_res_get_client_avg_rating.average_rating;
+		// result.review.rating_amount =
+		// 	temp_res_get_client_review_rating_amount.rating_amount;
+		// result.review.review_list = temp_res_get_client_client_review_list;
 
-		console.log(result);
+		// console.log(result);
+
+		let SP = ``;
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mengambil Data.");
+		}
 
 		return result;
 	}
