@@ -2,6 +2,31 @@ const express = require("express");
 const app = express();
 const Task = require("../models/taskModel.js");
 
+app.getNewTask = async (req, res) => {
+	console.log(req.params);
+
+	var result = {};
+	result.error_schema = {};
+	result.output_schema = { tasks: "" };
+
+	const taskInstance = new Task();
+	let task_result = await taskInstance.getNewTask();
+
+	// console.log(taskResult);
+	if (task_result instanceof Error) {
+		result.error_schema = {
+			error_code: 903,
+			error_message: "Tidak ada data yang ditemukan.",
+		};
+		result.output_schema = {};
+	} else {
+		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.output_schema.tasks = task_result;
+	}
+
+	res.send(result);
+};
+
 app.getNewTaskByCategory = async (req, res) => {
 	console.log(req.params);
 
@@ -21,7 +46,7 @@ app.getNewTaskByCategory = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.tasks = taskResult;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.tasks = taskResult;
