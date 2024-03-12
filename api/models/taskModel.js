@@ -24,12 +24,12 @@ module.exports = class Task {
 		return result;
 	}
 
-	async getTaskList(headers) {
-		const searchText = headers["search_text"];
-		const subcategory = headers["sub_category"];
-		const budget = headers["budget"];
-		const difficulty = headers["difficulty"];
-		const lastId = headers["last_id"];
+	async getTaskList(body) {
+		const searchText = body["search_text"];
+		const subcategory = body["sub_category"];
+		const budget = body["budget"];
+		const difficulty = body["difficulty"];
+		const lastId = body["last_id"];
 
 		let SP = `SELECT task_id as id, name, description, tags, deadline as due_date, difficulty, price FROM public.task`;
 

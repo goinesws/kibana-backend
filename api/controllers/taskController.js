@@ -62,11 +62,11 @@ app.getTaskList = async (req, res) => {
 	result.output_schema = {};
 
 	const taskInstance = new Task();
-	let taskListResult = await taskInstance.getTaskList(req.headers);
+	let taskListResult = await taskInstance.getTaskList(req.body);
 	let total_amount = taskListResult.length;
 	let has_next_page = true;
 
-	if (req.headers.last_id !== "") {
+	if (req.body.last_id !== "" && req.body.last_id) {
 		const indexOfTarget = taskListResult.findIndex(
 			(obj) => obj.id === req.headers.last_id
 		);
