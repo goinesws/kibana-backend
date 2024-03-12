@@ -76,7 +76,7 @@ router.post(
 // Service Related
 router.get("/api/service/new/:categoryId", serviceController.getNewService);
 router.get("/api/service/new", serviceController.getNewService);
-router.get("/api/service/list", serviceController.getServiceList);
+router.post("/api/service/list", serviceController.getServiceList);
 router.get(
 	"/api/service/detail/:serviceId",
 	serviceController.getServiceDetail
