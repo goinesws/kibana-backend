@@ -7,7 +7,20 @@ const Review = require("../models/reviewModel");
 
 module.exports = class Task {
 	async getNewTask() {
-		let SP = ``;
+		let SP = `
+    select 
+    task_id as id,
+    name as name,
+    description as description,
+    tags as tags,
+    deadline as due_date,
+    difficulty as difficulty,
+    price as price 
+    from 
+    public.task
+    order by task_id desc
+    LIMIT 4
+    `;
 
 		try {
 			let result = await db.any(SP);
@@ -161,59 +174,127 @@ module.exports = class Task {
 	}
 
 	async getTaskDetails(taskId) {
-		// let result = {};
-		// // SP buat task details
-		// let SPTaskDetails = `select task_id as id, name, tags, deadline as due_date, difficulty, price, description
-		// from public.task where "task_id" = '${taskId}';`;
+		let result = {};
 
-		// let temp_task_detail = await db.any(SPTaskDetails);
-
-		// result.task_detail = temp_task_detail[0];
-
-		// let SPGetClient = `select public.client.client_id as id, profile_image as profile_image_url, public.client.name from public.client
-		// join
-		// public.task
-		// on
-		// public.client.client_id = public.task.client_id
-		// and
-		// public.task.task_id = '${taskId}';`;
-
-		// let temp_client = await db.any(SPGetClient);
-
-		// result.client = temp_client;
-
-		// let temp_registered_freelancer = await Freelancer.getFreelancerByTaskID(
-		// 	taskId
-		// );
-
-		// result.registered_freelancer = temp_registered_freelancer;
-
-		// let temp_res_get_client_client_review_list =
-		// 	await Review.getClientReviewByTaskID(taskId);
-		// let temp_res_get_client_review_rating_amount =
-		// 	await Review.getClientReviewRatingAmountByTaskID(taskId);
-		// let temp_res_get_client_avg_rating =
-		// 	await Review.getClientAvgRatingByTaskID(taskId);
-
-		// result.review = {};
-
-		// result.review.average_rating =
-		// 	temp_res_get_client_avg_rating.average_rating;
-		// result.review.rating_amount =
-		// 	temp_res_get_client_review_rating_amount.rating_amount;
-		// result.review.review_list = temp_res_get_client_client_review_list;
-
-		// console.log(result);
-
-		let SP = ``;
-
+		let task_details;
 		try {
-			let result = await db.any(SP);
-
-			return result;
+			let SP = `
+      select 
+      task_id as id,
+      name as name,
+      tags as tags,
+      deadline as due_date,
+      difficulty as difficulty,
+      price as price,
+      description as description 
+      from 
+      public.task 
+      where
+      task_id = '${taskId}'
+      `;
+			task_details = await db.any(SP);
 		} catch (error) {
 			return new Error("Gagal Mengambil Data.");
 		}
+
+		let client_details;
+		try {
+			let SP = `
+      select 
+      c.client_id as id,
+      profile_image as profile_image_url,
+      c.name as name
+      from
+      public.task t
+      join
+      public.client c 
+      on
+      t.client_id = c.client_id
+      where 
+      task_id = '${taskId}';
+      `;
+
+			client_details = await db.any(SP);
+		} catch (error) {
+			return new Error("Gagal Mengambil Data.");
+		}
+
+		let reg_freelancer_details;
+		try {
+			let SP = `
+      select
+      f.freelancer_id as id,
+      c.profile_image as profile_image_url,
+      c.name as name
+      from
+      public.task t
+      join
+      public.task_enrollment te
+      on
+      t.task_id = te.task_id
+      join
+      public.freelancer f
+      on
+      te.freelancer_id = f.freelancer_id
+      join
+      public.client c
+      on
+      f.user_id = c.client_id
+      where
+      t.task_id = '${taskId}';
+      `;
+
+			reg_freelancer_details = await db.any(SP);
+		} catch (error) {
+			return new Error("Gagal Mengambil Data.");
+		}
+
+		let review_details;
+		try {
+			let SP = `
+      select 
+      avg(rating) as average_rating,
+      count(*) as task_amount,
+      (
+        select json_agg(t)
+        from
+        (
+          select 
+          c.name,
+          r.rating as star,
+          r.content as description,
+          r.date as timestamp
+          from
+          public.review r
+          join
+          public.freelancer f
+          on
+          r.writer_id = f.freelancer_id
+          join
+          public.client c
+          on
+          f.user_id = c.client_id
+          where
+          destination_id = (select client_id from public.task where task_id = '${taskId}')		
+        ) t
+      ) as review_list
+      from 
+      public.review
+      where
+      destination_id = (select client_id from public.task where task_id = '${taskId}')
+      or
+      destination_id = '${taskId}'
+      `;
+
+			review_details = await db.any(SP);
+		} catch (error) {
+			return new Error("Gagal Mengambil Data.");
+		}
+
+		result.task_detail = task_details[0];
+		result.client = client_details[0];
+		result.registered_freelancer = reg_freelancer_details;
+		result.review = review_details[0];
 
 		return result;
 	}
