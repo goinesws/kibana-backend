@@ -15,44 +15,77 @@ module.exports = class Client {
     and
     public.task.task_id = '${taskId}';`;
 
-		let result = await db.any(SPGetClient);
+		// console.log("Hasil : ");
+		// console.log(result);
+		try {
+			let result = await db.any(SPGetClient);
 
-		console.log("Hasil : ");
-		console.log(result);
-
-		return result[0];
+			return result[0];
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getOtherClientProfile(userId) {
-		let SPGetClientDetails = `select client_id as id, profile_image as profile_image_url, name, username from public.client 
-    where client_id = '${userId}'; `;
+		let SPGetClientDetails = `
+		select 
+		c.client_id as id, 
+		c.profile_image as profile_image_url, 
+		c.name, 
+		c.username 
+		from 
+		public.client c
+		join
+		public.freelancer f
+		on 
+		f.user_id = c.client_id
+    where 
+		c.client_id = '${userId}'
+		or f.freelancer_id = '${userId}'; `;
 
-		let result = await db.any(SPGetClientDetails);
+		try {
+			let result = await db.any(SPGetClientDetails);
 
-		return result[0];
+			return result[0];
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
-	static async getClientReview(userId) {
+	async getClientReview(userId) {
 		let result = {};
-		let review = await Review.getClientReviewByUserId(userId);
 
-		let average_rating = await Review.getClientAverageRatingByUserId(userId);
+		let reviewInstance = new Review();
 
-		let rating_amount = await Review.getClientReviewRatingAmountByUserId(
-			userId
-		);
+		try {
+			let review = await reviewInstance.getClientReviewByUserId(userId);
 
-		result.average_rating = average_rating;
-		result.rating_amount = rating_amount;
-		result.review_list = review;
+			let average_rating = await reviewInstance.getClientAverageRatingByUserId(
+				userId
+			);
 
-		return result;
+			let rating_amount =
+				await reviewInstance.getClientReviewRatingAmountByUserId(userId);
+
+			result.average_rating = average_rating;
+			result.rating_amount = rating_amount;
+			result.review_list = review;
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getClientTask(userId) {
-		let result = await Task.getTaskByClientId(userId);
+		let taskInstance = new Task();
+		try {
+			let result = await taskInstance.getTaskByClientId(userId);
 
-		return result;
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async register(data, cv_url, port_url, userId) {

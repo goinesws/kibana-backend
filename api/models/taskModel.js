@@ -44,12 +44,18 @@ module.exports = class Task {
       tags,
       TO_CHAR(created_date, 'DD Mon YYYY') from task where task_id = '${task_id}'`;
 
-		let result = await db.any(SP);
+		try {
+			let result = await db.any(SP);
 
-		return result;
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data");
+		}
 	}
 
 	async getTaskList(body) {
+		// console.log(body);
+
 		const searchText = body["search_text"];
 		const subcategory = body["sub_category"];
 		const budget = body["budget"];
@@ -63,7 +69,7 @@ module.exports = class Task {
       OR '${searchText}' ILIKE ANY (tags))`;
 		}
 		if (subcategory !== "" && subcategory) {
-			if (searchText !== "") SP += ` AND`;
+			if (searchText !== "" && searchText) SP += ` AND`;
 			else SP += ` WHERE`;
 			SP += ` sub_category_id = '${subcategory}'`;
 		}
@@ -96,9 +102,12 @@ module.exports = class Task {
 			SP += ` difficulty = '${difficulty}'`;
 		}
 
-		let result = await db.any(SP);
-
-		return result;
+		try {
+			let result = await db.any(SP);
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data");
+		}
 	}
 
 	async getNewTaskByCategory(categoryId) {
@@ -110,24 +119,54 @@ module.exports = class Task {
 
 		// console.log(subcat_list);
 
-		let SPGetTask = `select task_id as id, name, description, tags, deadline as due_date, difficulty, price from public.task where sub_category_id in 
-    ${subcat_list} and status = 'ChooseFreelancer' order by deadline ASC limit 4;`;
+		let SPGetTask = `
+    select 
+    t.task_id as id, 
+    t.name, 
+    t.description, 
+    t.tags, 
+    t.deadline as due_date, 
+    t.difficulty, 
+    t.price 
+    from public.task t
+    join
+    public.transaction tr
+    on
+    t.task_id = tr.project_id
+    where 
+    t.sub_category_id 
+    in 
+    ${subcat_list} and tr.status = '1' 
+    order by t.deadline ASC 
+    limit 4;`;
 
 		// console.log(SPGetTask);
 
-		let result = await db.any(SPGetTask);
+		// let result = await db.any(SPGetTask);
 
-		// console.log(result);
-		// dari resultnya dijadiin ke constructornya dlu
-		return result;
+		// // console.log(result);
+		// // dari resultnya dijadiin ke constructornya dlu
+		// return result;
+
+		try {
+			let result = await db.any(SPGetTask);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data");
+		}
 	}
 
 	async getTaskCategoryDetail(categoryId) {
 		const subcatInstance = new Subcategory();
-		let result = await subcatInstance.getSubcatByCategoryID(categoryId);
+		try {
+			let result = await subcatInstance.getSubcatByCategoryID(categoryId);
 
-		if (result.length == 0) return null;
-		else return result;
+			if (result.length == 0) return null;
+			else return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getTaskCategories() {
@@ -302,24 +341,32 @@ module.exports = class Task {
 	async getTaskByClientId(userId) {
 		let SP = `
     select 
-    task_id as id,
-    name,
-    description,
-    tags,
-    deadline as due_date,
-    difficulty,
-    price
+    t.task_id as id,
+    t.name,
+    t.description,
+    t.tags,
+    t.deadline as due_date,
+    t.difficulty,
+    t.price
     from 
-    public.task
+    public.task t
+    join
+    public.transaction tr
+    on
+    t.task_id = tr.project_id
     where
-    client_id = '${userId}'
+    t.client_id = '${userId}'
     and
-    status = '1';
+    tr.status = '1';
     `;
 
-		let result = await db.any(SP);
+		try {
+			let result = await db.any(SP);
 
-		return result;
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async createTask(data, userId) {

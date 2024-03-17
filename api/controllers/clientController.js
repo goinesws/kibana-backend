@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const User = require("../models/userModel.js");
 const Client = require("../models/clientModel.js");
 const Freelancer = require("../models/freelancerModel.js");
 const Google = require("../models/googleModel.js");
@@ -60,7 +61,11 @@ app.registerAsFreelancer = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let userInstance = new User();
+	let curr_session = await userInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		// get file cv
 		let cv_id = "";
 		let cv_url = "";
@@ -112,7 +117,7 @@ app.registerAsFreelancer = async (req, res) => {
 		// get data and regsiter via clientModels
 
 		const data = JSON.parse(req.body.data);
-		const userID = req.session.client_id;
+		const userID = curr_session.session_data.client_id;
 		console.log(data);
 
 		let clientInstance = new Client();

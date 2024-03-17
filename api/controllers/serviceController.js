@@ -28,7 +28,7 @@ app.getNewService = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.services = serviceResult;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.services = serviceResult;
@@ -52,7 +52,7 @@ app.getServiceByCategory = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.services = serviceResult;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.services = serviceResult;
@@ -98,7 +98,7 @@ app.getServiceList = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.services = serviceListResult;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.services = serviceListResult;
@@ -133,7 +133,7 @@ app.getServiceDetail = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.service_detail = serviceResult;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.service_detail = serviceResult;
@@ -150,7 +150,12 @@ const upload = multer({ storage: storage });
 app.createNewService = async (req, res) => {
 	var serviceInstance = new Service();
 	let result = {};
-	if (req.get("X-Token") == req.session.id) {
+
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		var images = [];
 
 		images.push(await serviceInstance.addServiceImage(req.files["image_1"]));
@@ -165,7 +170,7 @@ app.createNewService = async (req, res) => {
 
 		images = images.map((link) => link.replace(/"/g, ""));
 
-		var freelancerId = req.session.freelancer_id;
+		var freelancerId = curr_session.session_data.freelancer_id;
 
 		//process data
 		var newServiceId = await serviceInstance.createNewService(
@@ -197,11 +202,16 @@ app.createNewService = async (req, res) => {
 
 app.getOwnedService = async (req, res) => {
 	let result = {};
-	if (req.get("X-Token") == req.session.id) {
+
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		result.error_schema = {};
 		result.output_schema = { services: "" };
 
-		const freelancer_id = req.session.freelancer_id;
+		const freelancer_id = curr_session.session_data.freelancer_id;
 
 		var serviceInstance = new Service();
 		var serviceResult = await serviceInstance.getOwnedService(freelancer_id);
@@ -211,7 +221,7 @@ app.getOwnedService = async (req, res) => {
 				error_code: 903,
 				error_message: "Tidak ada data yang ditemukan.",
 			};
-			result.output_schema.services = serviceResult;
+			result.output_schema = {};
 		} else {
 			result.error_schema = { error_code: 200, error_message: "Sukses" };
 			result.output_schema.services = serviceResult;
@@ -231,11 +241,16 @@ app.getOwnedServiceDetail = async (req, res) => {
 
 	// console.log(req.get('X-Token') + "token")
 	// console.log(req.session.id + "sess id")
-	if (req.get("X-Token") == req.session.id) {
+
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		result.error_schema = {};
 		result.output_schema = { service_detail: "" };
 
-		const freelancer_id = req.session.freelancer_id;
+		const freelancer_id = curr_session.session_data.freelancer_id;
 		const service_id = req.params.serviceId;
 
 		var serviceInstance = new Service();
@@ -251,7 +266,7 @@ app.getOwnedServiceDetail = async (req, res) => {
 					error_code: 903,
 					error_message: "Tidak ada data yang ditemukan.",
 				};
-				result.output_schema.service_detail = serviceResult;
+				result.output_schema = {};
 			} else {
 				result.error_schema = { error_code: 200, error_message: "Sukses" };
 				result.output_schema.service_detail = serviceResult;
@@ -274,11 +289,15 @@ app.getOwnedServiceDetail = async (req, res) => {
 app.getOwnedServiceOrders = async (req, res) => {
 	let result = {};
 
-	if (req.get("X-Token") == req.session.id) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		result.error_schema = {};
 		result.output_schema = { transactions: "" };
 
-		const freelancer_id = req.session.freelancer_id;
+		const freelancer_id = curr_session.session_data.freelancer_id;
 		const service_id = req.params.serviceId;
 
 		var serviceInstance = new Service();
@@ -294,7 +313,7 @@ app.getOwnedServiceOrders = async (req, res) => {
 					error_code: 903,
 					error_message: "Tidak ada data yang ditemukan.",
 				};
-				result.output_schema.transactions = serviceResult;
+				result.output_schema = {};
 			} else {
 				result.error_schema = { error_code: 200, error_message: "Sukses" };
 				result.output_schema.transactions = serviceResult;
@@ -317,11 +336,15 @@ app.getOwnedServiceOrders = async (req, res) => {
 app.deactivateService = async (req, res) => {
 	let result = {};
 
-	if (req.get("X-Token") == req.session.id) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		result.error_schema = {};
 		result.output_schema = { transactions: "" };
 
-		const freelancer_id = req.session.freelancer_id;
+		const freelancer_id = curr_session.session_data.freelancer_id;
 		const service_id = req.params.serviceId;
 
 		var serviceInstance = new Service();
@@ -335,7 +358,7 @@ app.deactivateService = async (req, res) => {
 					error_code: 903,
 					error_message: "Deactivate gagal.",
 				};
-				result.output_schema.transactions = serviceResult;
+				result.output_schema = {};
 			} else {
 				result.error_schema = { error_code: 200, error_message: "Sukses" };
 				result.output_schema.transactions = serviceResult;
@@ -358,11 +381,15 @@ app.deactivateService = async (req, res) => {
 app.deleteService = async (req, res) => {
 	let result = {};
 
-	if (req.get("X-Token") == req.session.id) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		result.error_schema = {};
 		result.output_schema = { transactions: "" };
 
-		const freelancer_id = req.session.freelancer_id;
+		const freelancer_id = curr_session.session_data.freelancer_id;
 		const service_id = req.params.serviceId;
 
 		var serviceInstance = new Service();
@@ -376,7 +403,7 @@ app.deleteService = async (req, res) => {
 					error_code: 903,
 					error_message: "Delete gagal.",
 				};
-				result.output_schema.transactions = serviceResult;
+				result.output_schema = {};
 			} else {
 				result.error_schema = { error_code: 200, error_message: "Sukses" };
 				result.output_schema.transactions = serviceResult;
@@ -400,13 +427,19 @@ app.deleteService = async (req, res) => {
 app.getServiceHistory = async (req, res) => {
 	let result = {};
 
-	if (req.get("X-Token") == req.session.id) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		result.error_schema = {};
 		result.output_schema = { service_detail: "" };
 		var serviceInstance = new Service();
 		var userInstance = new User();
 
-		const client_id = userInstance.getClientID(req.session.username);
+		const client_id = userInstance.getClientID(
+			curr_session.session_data.username
+		);
 		var serviceResult = await serviceInstance.getClientServiceHistory(
 			client_id
 		);
@@ -416,7 +449,7 @@ app.getServiceHistory = async (req, res) => {
 				error_code: 903,
 				error_message: "Tidak ada data yang ditemukan.",
 			};
-			result.output_schema.service_detail = serviceResult;
+			result.output_schema = {};
 		} else {
 			result.error_schema = { error_code: 200, error_message: "Sukses" };
 			result.output_schema.service_detail = serviceResult;

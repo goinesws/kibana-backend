@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const Freelancer = require("../models/freelancerModel.js");
+const User = require("../models/userModel.js");
 var multer = require("multer");
 const { authorize, listFiles, uploadFile } = require("../models/googleModel");
 
@@ -19,7 +20,7 @@ app.getFreelancerDescription = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema = null;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema = desc;
@@ -45,7 +46,7 @@ app.getFreelancerEducationHistory = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.education_history = null;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.education_history = edu;
@@ -69,7 +70,7 @@ app.getFreelancerSkill = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.skills = null;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema.skills = skills;
@@ -93,7 +94,7 @@ app.getFreelancerCV = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema = null;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema = CV;
@@ -117,7 +118,7 @@ app.getPortfolio = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema = null;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema = portfolio;
@@ -141,10 +142,10 @@ app.getOwnedService = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema = null;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
-		result.output_schema = owned_service;
+		result.output_schema.services = owned_service;
 	}
 
 	res.send(result);
@@ -180,10 +181,15 @@ app.editFreelancerDescription = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	console.log(req.session.id);
-	console.log(req.get("X-Token"));
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
-		let userId = req.session.client_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
+		let userId = curr_session.session_data.client_id;
 		let description = req.body.description;
 		let freelancerInstance = new Freelancer();
 		let edit_result = await freelancerInstance.editDescription(
@@ -223,8 +229,15 @@ app.editFreelancerSkills = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
-		let userId = req.session.client_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
+		let userId = curr_session.session_data.client_id;
 		let skills = JSON.stringify(req.body.skills);
 		console.log(skills);
 		skills = skills.replace("[", "{");
@@ -269,10 +282,17 @@ app.editFreelancerEducation = async (req, res) => {
 	result.output_schema = {};
 
 	let education = req.body.education_history;
-	console.log(education);
+	// console.log(education);
 
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
-		let userId = req.session.client_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
+		let userId = curr_session.session_data.client_id;
 		let freelancerInstance = new Freelancer();
 		console.log(education.length);
 
@@ -315,9 +335,16 @@ app.editFreelancerCV = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
 	// cek session id ama x-token + cek if freelancer
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
-		let userId = req.session.client_id;
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
+		let userId = curr_session.session_data.client_id;
 		let freelancerInstance = new Freelancer();
 		const id = await authorize()
 			.then((auth) => {
@@ -368,8 +395,15 @@ app.editFreelancerPortfolio = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
-		let userId = req.session.client_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
+		let userId = curr_session.session_data.client_id;
 		let freelancerInstance = new Freelancer();
 		const id = await authorize()
 			.then((auth) => {

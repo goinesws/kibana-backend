@@ -34,7 +34,7 @@ app.listen(port, () => {
 	console.log("Server is running on port 3000");
 });
 
-app.use("/", router);
+app.use("", router);
 
 // // If modifying these scopes, delete token.json.
 // const SCOPES = ['https://www.googleapis.com/auth/drive.file'];

@@ -125,7 +125,7 @@ router.get(
 router.get("/api/account/profile/:userId", userController.getOtherProfile);
 router.get("/api/account/my/profile", userController.getMyProfile);
 router.get("/api/account/bank-detail", userController.getMyBankDetails);
-router.get("/api/account/edit/bank-detail", userController.editBankDetails);
+router.post("/api/account/edit/bank-detail", userController.editBankDetails);
 router.get(
 	"/api/account/project/history/:userId",
 	freelancerController.getFreelancerProjectHistory
@@ -189,7 +189,30 @@ router.get(
 	"/api/transaction/invoice/:transactionId",
 	transactionController.getTransactionInvoice
 );
-router.get("/api/transaction/invoice/:transactionId/completed");
+router.get(
+	"/api/transaction/invoice/:transactionId/completed",
+	transactionController.getTransactionInvoice
+);
+router.get(
+	"/api/transaction/task/client/:transactionId",
+	transactionController.getTransactionDetailsClientTask
+);
+router.get(
+	"/api/transaction/task/freelancer/:transactionId",
+	transactionController.getTransactionDetailsFreelancerTask
+);
+router.get(
+	"/api/transaction/:transactionId/client/activity",
+	transactionController.getClientTransactionActivity
+);
+router.get(
+	"/api/transaction/service/client/:transactionId",
+	transactionController.getTransactionDetailsClientService
+);
+router.get(
+	"/api/transaction/service/freelancer/:transactionId",
+	transactionController.getTransactionDetailsFreelancerService
+);
 
 router.post(
 	"/test1",

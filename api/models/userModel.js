@@ -91,7 +91,7 @@ module.exports = class User {
 		name,
 		client_id as id,
 		(select freelancer_id from public.freelancer where user_id = 
-		(select client_id from public.client where username = '${username_email}' or email = '${username_email}'))
+		(select client_id from public.client where username = '${username_email}' or email = '${username_email}') limit 1)
 		from 
 		public.client
 		where
@@ -104,7 +104,13 @@ module.exports = class User {
 		try {
 			let result = await db.any(SP);
 
-			return result[0];
+			// console.log(result);
+
+			if (result.length < 1) {
+				return new Error("Proses Login gagal");
+			} else {
+				return result[0];
+			}
 		} catch (error) {
 			return new Error("Proses Login gagal");
 		}
@@ -226,21 +232,45 @@ module.exports = class User {
 	}
 
 	async getClientID(username) {
-		let SPGetClientID = `select client_id from public.client where email = '${username}' or username='${username}';`;
-		let res = await db.any(SPGetClientID);
+		let SPGetClientID = `
+		select 
+		client_id 
+		from 
+		public.client 
+		where email = '${username}' 
+		or username='${username}';`;
+		// let res = await db.any(SPGetClientID);
+		// var client_id = res[0].client_id;
 
-		console.log(res[0].client_id + "RESCLEU");
-		var client_id = res[0].client_id;
+		try {
+			let res = await db.any(SPGetClientID);
+			var client_id = res[0].client_id;
 
-		return client_id;
+			return client_id;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getMyProfile(clientId) {
-		let SP = `select client_id as id, profile_image as profile_image_url, email, name, username, phone_number from public.client where client_id = '${clientId}';`;
+		let SP = `
+		select 
+		client_id as id, 
+		profile_image as profile_image_url, 
+		email, 
+		name, 
+		username, 
+		phone_number 
+		from public.client 
+		where client_id = '${clientId}';`;
 
-		let result = await db.any(SP);
+		try {
+			let result = await db.any(SP);
 
-		return result[0];
+			return result[0];
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getBankDetails(clientId) {
@@ -255,9 +285,13 @@ module.exports = class User {
     user_id = '${clientId}';
     `;
 
-		let result = await db.any(SP);
+		try {
+			let result = await db.any(SP);
 
-		return result[0];
+			return result[0];
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async editMyprofile(clientId, data, image_url) {
@@ -273,7 +307,7 @@ module.exports = class User {
 		where client_id = '${clientId}'
 		`;
 
-		console.log(SP);
+		// console.log(SP);
 
 		try {
 			let result = await db.any(SP);
@@ -295,12 +329,16 @@ module.exports = class User {
     where 
     user_id = '${clientId}';`;
 
-		let res = await db.any(SP);
-
 		// console.log('--RES--');
 		// console.log(res);
 
-		return res;
+		try {
+			let res = await db.any(SP);
+
+			return res;
+		} catch (error) {
+			return new Error("Gagal Mengubah Data.");
+		}
 	}
 
 	async addUserImage(image) {
@@ -333,5 +371,69 @@ module.exports = class User {
 			});
 
 		return link;
+	}
+
+	async setUserSessionData(client_id, session_id, session_data) {
+		let SP = `
+			update 
+			public.client
+			set
+			session_id = '${session_id}',
+			session_data = '${session_data}'
+			where
+			client_id = '${client_id}'
+		`;
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mengubah Data.");
+		}
+	}
+
+	async getUserSessionData(session_id) {
+		let SP = `
+			select
+			session_id,
+			session_data
+			from
+			public.client
+			where
+			session_id = '${session_id}';
+		`;
+
+		try {
+			let result = await db.any(SP);
+
+			if (result.length < 1) {
+				return new Error("Gagal Mendapatkan Data.");
+			} else {
+				return result[0];
+			}
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
+	}
+
+	async logout(client_id) {
+		let SP = `
+			update 
+			public.client
+			set
+			session_id = null,
+			session_data = null
+			where
+			client_id = '${client_id}'
+		`;
+
+		try {
+			let result = await db.any(SP);
+
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mengubah Data.");
+		}
 	}
 };

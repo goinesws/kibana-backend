@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const Review = require("../models/reviewModel.js");
+const User = require("../models/userModel.js");
 
 app.insertReviewClient = async (req, res) => {
 	let result = {};
@@ -8,14 +9,18 @@ app.insertReviewClient = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
 	if (
-		req.get("X-Token") == req.session.id &&
-		req.session.is_freelancer == true
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
 	) {
-		let freelancerId = req.session.freelancer_id;
+		let freelancerId = curr_session.session_data.freelancer_id;
 		let data = req.body;
 		let reviewInstance = new Review();
-		let review_insert_result = reviewInstance.insertClientReview(
+		let review_insert_result = await reviewInstance.insertClientReview(
 			freelancerId,
 			data
 		);
@@ -52,11 +57,15 @@ app.insertReviewFreelancer = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.get("X-Token") == req.session.id) {
-		let userId = req.session.client_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
+		let userId = curr_session.session_data.client_id;
 		let data = req.body;
 		let reviewInstance = new Review();
-		let review_insert_result = reviewInstance.insertFreelancerReview(
+		let review_insert_result = await reviewInstance.insertFreelancerReview(
 			userId,
 			data
 		);
@@ -93,11 +102,18 @@ app.insertReviewService = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.get("X-Token") == req.session.id) {
-		let userId = req.session.client_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
+		let userId = curr_session.session_data.client_id;
 		let data = req.body;
 		let reviewInstance = new Review();
-		let review_insert_result = reviewInstance.insertServiceReview(userId, data);
+		let review_insert_result = await reviewInstance.insertServiceReview(
+			userId,
+			data
+		);
 
 		if (review_insert_result instanceof Error) {
 			result.error_schema = {

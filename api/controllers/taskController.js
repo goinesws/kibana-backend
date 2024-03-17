@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const Task = require("../models/taskModel.js");
+const User = require("../models/userModel.js");
 
 app.getNewTask = async (req, res) => {
 	console.log(req.params);
@@ -71,7 +72,7 @@ app.getTaskDetails = async (req, res) => {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema = taskDetailResult;
+		result.output_schema = {};
 	} else {
 		result.error_schema = { error_code: 200, error_message: "Sukses" };
 		result.output_schema = taskDetailResult;
@@ -91,38 +92,49 @@ app.getTaskList = async (req, res) => {
 	let total_amount = taskListResult.length;
 	let has_next_page = true;
 
-	if (req.body.last_id !== "" && req.body.last_id) {
-		const indexOfTarget = taskListResult.findIndex(
-			(obj) => obj.id === req.headers.last_id
-		);
-		if (indexOfTarget !== -1) {
-			taskListResult = taskListResult.slice(
-				indexOfTarget + 1,
-				indexOfTarget + 9
-			);
-		} else {
-			console.log("Object with specified id not found.");
-		}
-		if (total_amount - (indexOfTarget + 1) > 8) has_next_page = true;
-		else has_next_page = false;
-	} else {
-		taskListResult = taskListResult.slice(0, 8);
-		if (total_amount > 8) has_next_page = true;
-		else has_next_page = false;
-	}
+	// console.log("Task List Result : " + taskListResult);
 
-	if (taskListResult == "" || taskListResult == null) {
+	if (taskListResult instanceof Error) {
 		result.error_schema = {
 			error_code: 903,
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema.tasks = taskListResult;
+		result.output_schema = {};
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
-		result.output_schema.tasks = taskListResult;
-		result.output_schema.total_amount = total_amount;
-		result.output_schema.has_next_page = has_next_page;
-		result.output_schema.last_id = taskListResult[taskListResult.length - 1].id;
+		if (req.body.last_id !== "" && req.body.last_id) {
+			const indexOfTarget = taskListResult.findIndex(
+				(obj) => obj.id === req.headers.last_id
+			);
+			if (indexOfTarget !== -1) {
+				taskListResult = taskListResult.slice(
+					indexOfTarget + 1,
+					indexOfTarget + 9
+				);
+			} else {
+				console.log("Object with specified id not found.");
+			}
+			if (total_amount - (indexOfTarget + 1) > 8) has_next_page = true;
+			else has_next_page = false;
+		} else {
+			taskListResult = taskListResult.slice(0, 8);
+			if (total_amount > 8) has_next_page = true;
+			else has_next_page = false;
+		}
+
+		if (taskListResult == "" || taskListResult == null) {
+			result.error_schema = {
+				error_code: 903,
+				error_message: "Tidak ada data yang ditemukan.",
+			};
+			result.output_schema = {};
+		} else {
+			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.output_schema.tasks = taskListResult;
+			result.output_schema.total_amount = total_amount;
+			result.output_schema.has_next_page = has_next_page;
+			result.output_schema.last_id =
+				taskListResult[taskListResult.length - 1].id;
+		}
 	}
 
 	res.send(result);
@@ -134,12 +146,16 @@ app.createTask = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		// let taskInstance = new Task();
 		// let create_task_result = taskInstance.createTask(req.body);
 
 		let data = req.body;
-		let userId = req.session.client_id;
+		let userId = curr_session.session_data.client_id;
 
 		let taskInstance = new Task();
 		let create_task_result = await taskInstance.createTask(data, userId);
@@ -175,10 +191,18 @@ app.getOwnedTask = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	console.log(curr_session);
+
+	if (curr_session.session_id == x_token) {
 		let taskInstance = new Task();
 
-		let task_result = await taskInstance.getOwnedTask(req.session.client_id);
+		let task_result = await taskInstance.getOwnedTask(
+			curr_session.session_data.client_id
+		);
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
@@ -209,9 +233,13 @@ app.getOwnedTaskDetails = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		let taskId = req.params.taskId;
-		let userId = req.session.client_id;
+		let userId = curr_session.session_data.client_id;
 
 		let taskInstance = new Task();
 		let task_result = await taskInstance.getOwnedTaskDetails(taskId, userId);
@@ -245,9 +273,13 @@ app.getRegisteredFreelancer = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		let taskId = req.params.taskId;
-		let userId = req.session.client_id;
+		let userId = curr_session.session_data.client_id;
 
 		let taskInstance = new Task();
 		let task_result = await taskInstance.getRegisteredFreelancer(
@@ -284,9 +316,13 @@ app.deleteTask = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 		let taskId = req.params.taskId;
-		let userId = req.session.client_id;
+		let userId = curr_session.session_data.client_id;
 
 		let taskInstance = new Task();
 		let task_result = taskInstance.deleteTask(taskId, userId);
@@ -321,8 +357,15 @@ app.getTaskHistory = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
-		let userId = req.session.freelancer_id;
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
+		let userId = curr_session.session_data.freelancer_id;
 		console.log(userId);
 
 		let taskInstance = new Task();
@@ -358,9 +401,16 @@ app.getTaskHistoryDetails = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token") && req.session.is_freelancer) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (
+		curr_session.session_id == x_token &&
+		curr_session.session_data.is_freelancer
+	) {
 		let taskId = req.params.taskId;
-		let userId = req.session.freelancer_id;
+		let userId = curr_session.session_data.freelancer_id;
 
 		let taskInstance = new Task();
 		let task_result = await taskInstance.getTaskHistoryDetails(taskId, userId);
@@ -395,7 +445,11 @@ app.chooseFreelancer = async (req, res) => {
 	result.error_schema = {};
 	result.output_schema = {};
 
-	if (req.session.id == req.get("X-Token")) {
+	let x_token = req.get("X-Token");
+	let UserInstance = new User();
+	let curr_session = await UserInstance.getUserSessionData(x_token);
+
+	if (curr_session.session_id == x_token) {
 	} else {
 		result.error_schema = {
 			error_code: 403,

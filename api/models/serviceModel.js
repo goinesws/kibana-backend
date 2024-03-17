@@ -11,7 +11,7 @@ const { v4: uuidv4 } = require("uuid");
 class Service {
 	constructor() {}
 
-  async getAllServiceDetail(service_id) {
+	async getAllServiceDetail(service_id) {
 		try {
 			var SP = `select service_id,
       subcategory_id,
@@ -30,7 +30,7 @@ class Service {
 		}
 	}
 
-  async getAdditionalData(service_id) {
+	async getAdditionalData(service_id) {
 		try {
 			var SP = `SELECT 
           question as title
@@ -41,8 +41,7 @@ class Service {
         WHERE
           service_id = '${service_id}'
         AND
-          is_true = TRUE`
-      ;
+          is_true = TRUE`;
 			const result = await db.any(SP);
 			return result;
 		} catch (error) {
@@ -267,7 +266,7 @@ class Service {
             GROUP BY 
               service.service_id`;
 			const result = await db.any(SP);
-			return result;
+			return result[0];
 		} catch (error) {
 			throw new Error("Failed to fetch user tasks");
 		}
@@ -435,7 +434,7 @@ class Service {
 		}
 	}
 
-  async getOwnedServiceDetail(service_id) {
+	async getOwnedServiceDetail(service_id) {
 		try {
 			var SP = `SELECT
       service.service_id AS id,

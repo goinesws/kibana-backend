@@ -6,9 +6,13 @@ module.exports = class Category {
 	async getAllCategoriesForTask() {
 		let SPGetCategories = `select category_id as id, name, image from public.category`;
 
-		let result = await db.any(SPGetCategories);
+		try {
+			let result = await db.any(SPGetCategories);
 
-		return result;
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getAllCategorySubcategory() {
@@ -34,9 +38,13 @@ module.exports = class Category {
             category.category_id, category.name, category.image
       ORDER BY id asc`;
 
-		let result = await db.any(SPGetCategories);
+		try {
+			let result = await db.any(SPGetCategories);
 
-		return result;
+			return result;
+		} catch (error) {
+			return new Error("Gagal Mendapatkan Data.");
+		}
 	}
 
 	async getAllCategorySubcategoryTask() {
@@ -80,7 +88,5 @@ module.exports = class Category {
 		} catch (error) {
 			return new Error("Error Get Data.");
 		}
-
-		return result;
 	}
 };
