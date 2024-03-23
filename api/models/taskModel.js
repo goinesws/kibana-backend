@@ -356,6 +356,20 @@ module.exports = class Task {
     t.task_id = tr.project_id
     where
     t.client_id = '${userId}'
+    or
+    t.client_id = 
+    (
+      select 
+      client_id 
+      from
+      public.client c
+      join
+      public.freelancer f
+      on
+      c.client_id = f.user_id
+      where
+      f.freelancer_id = '${userId}'
+    )
     and
     tr.status = '1';
     `;
@@ -463,6 +477,20 @@ module.exports = class Task {
     tr.project_id = t.task_id
     where
     t.client_id = '${userId}'
+    or
+    t.client_id = 
+    (
+      select 
+      client_id 
+      from
+      public.client c
+      join
+      public.freelancer f
+      on
+      c.client_id = f.user_id
+      where
+      f.freelancer_id = '${userId}'
+    );
     `;
 
 		try {
@@ -493,7 +521,24 @@ module.exports = class Task {
     where
     t.task_id = '${taskId}'
     and
-    t.client_id = '${userId}';
+    (
+      t.client_id = '${userId}'
+      or
+      t.client_id = 
+      (
+        select 
+        client_id 
+        from
+        public.client c
+        join
+        public.freelancer f
+        on
+        c.client_id = f.user_id
+        where
+        f.freelancer_id = '${userId}'
+      )
+    )
+    ;
     `;
 
 		try {
@@ -540,6 +585,21 @@ module.exports = class Task {
     task_id = '${taskId}'
     and
     client_id = '${userId}'
+    or
+    or
+    client_id = 
+    (
+      select 
+      client_id 
+      from
+      public.client c
+      join
+      public.freelancer f
+      on
+      c.client_id = f.user_id
+      where
+      f.freelancer_id = '${userId}'
+    )
     `;
 
 		try {
@@ -558,7 +618,22 @@ module.exports = class Task {
       public.task
       where task_id = '${taskId}'
       and 
-      client_id = '${userId}';
+      client_id = '${userId}'
+      or
+      client_id = 
+      (
+        select 
+        client_id 
+        from
+        public.client c
+        join
+        public.freelancer f
+        on
+        c.client_id = f.user_id
+        where
+        f.freelancer_id = '${userId}'
+      )
+      ;
     `;
 
 		try {

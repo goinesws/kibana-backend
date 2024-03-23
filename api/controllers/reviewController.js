@@ -27,13 +27,16 @@ app.insertReviewClient = async (req, res) => {
 
 		if (review_insert_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_mesage: "Insert Gagal.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_mesage: "Sukses.",
 			};
 			result.output_schema = {};
@@ -41,12 +44,13 @@ app.insertReviewClient = async (req, res) => {
 		res.send(result);
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_mesage:
 				"Anda tidak memiliki hak akses untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
-		res.send(result);
+
+		res.status(400).send(result);
 		return;
 	}
 };
@@ -72,13 +76,16 @@ app.insertReviewFreelancer = async (req, res) => {
 
 		if (review_insert_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_mesage: "Insert Gagal.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_mesage: "Sukses.",
 			};
 			result.output_schema = {};
@@ -86,12 +93,13 @@ app.insertReviewFreelancer = async (req, res) => {
 		res.send(result);
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_mesage:
 				"Anda tidak memiliki hak akses untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
-		res.send(result);
+
+		res.status(400).send(result);
 		return;
 	}
 };
@@ -117,26 +125,31 @@ app.insertReviewService = async (req, res) => {
 
 		if (review_insert_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_mesage: "Insert Gagal.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_mesage: "Sukses.",
 			};
 			result.output_schema = {};
 		}
 		res.send(result);
+		return;
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_mesage:
 				"Anda tidak memiliki hak akses untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
-		res.send(result);
+
+		res.status(400).send(result);
 		return;
 	}
 };

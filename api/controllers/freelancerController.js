@@ -17,16 +17,20 @@ app.getFreelancerDescription = async (req, res) => {
 
 	if (desc == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = desc;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getFreelancerEducationHistory = async (req, res) => {
@@ -43,16 +47,20 @@ app.getFreelancerEducationHistory = async (req, res) => {
 
 	if (edu == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.education_history = edu;
 	}
 
-	return res.send(result);
+	res.send(result);
+	return;
 };
 
 app.getFreelancerSkill = async (req, res) => {
@@ -67,16 +75,20 @@ app.getFreelancerSkill = async (req, res) => {
 
 	if (skills == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.skills = skills;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getFreelancerCV = async (req, res) => {
@@ -91,16 +103,20 @@ app.getFreelancerCV = async (req, res) => {
 
 	if (CV == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = CV;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getPortfolio = async (req, res) => {
@@ -115,16 +131,20 @@ app.getPortfolio = async (req, res) => {
 
 	if (portfolio == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = portfolio;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getOwnedService = async (req, res) => {
@@ -139,16 +159,20 @@ app.getOwnedService = async (req, res) => {
 
 	if (result == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.services = owned_service;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getFreelancerProjectHistory = async (req, res) => {
@@ -163,16 +187,20 @@ app.getFreelancerProjectHistory = async (req, res) => {
 
 	if (projects == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
-		result.output_schema = null;
+		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = projects;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.editFreelancerDescription = async (req, res) => {
@@ -199,17 +227,23 @@ app.editFreelancerDescription = async (req, res) => {
 
 		if (edit_result == null) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Edit tidak dapat dilakukan.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema = edit_result;
+
+			res.status(400).send(result);
+			return;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki akses untuk hal tersebut.",
 		};
 		result.output_schema = {};
@@ -250,17 +284,20 @@ app.editFreelancerSkills = async (req, res) => {
 
 		if (edit_result == null) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Edit tidak dapat dilakukan.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki akses untuk hal tersebut.",
 		};
 		result.output_schema = {};
@@ -304,7 +341,7 @@ app.editFreelancerEducation = async (req, res) => {
 
 			if (ed_result == null) {
 				result.error_schema = {
-					error_code: 903,
+					error_code: "903",
 					error_message: "Edit tidak dapat dilakukan.",
 				};
 				result.output_schema = {};
@@ -314,11 +351,11 @@ app.editFreelancerEducation = async (req, res) => {
 			}
 		});
 
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = {};
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki akses untuk hal tersebut.",
 		};
 		result.output_schema = {};
@@ -367,20 +404,20 @@ app.editFreelancerCV = async (req, res) => {
 
 		if (cv_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Edit tidak dapat dilakukan.",
 			};
 			result.output_schema = {};
 			res.send(result);
 			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema = {};
 			res.send(result);
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki akses untuk hal tersebut.",
 		};
 		result.output_schema = {};
@@ -429,20 +466,21 @@ app.editFreelancerPortfolio = async (req, res) => {
 
 		if (port_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Edit tidak dapat dilakukan.",
 			};
 			result.output_schema = {};
 			res.send(result);
 			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema = {};
 			res.send(result);
+			return;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki akses untuk hal tersebut.",
 		};
 		result.output_schema = {};

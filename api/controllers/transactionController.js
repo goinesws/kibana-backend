@@ -66,13 +66,13 @@ app.getTransactionInvoice = async (req, res) => {
 
 			if (projectResult == null) {
 				result.error_schema = {
-					error_code: 903,
+					error_code: "903",
 					error_message: errorMessages.DATA_NOT_FOUND,
 				};
 				result.output_schema.transactions = serviceResult;
 			} else {
 				result.error_schema = {
-					error_code: 200,
+					error_code: "200",
 					error_message: errorMessages.QUERY_SUCCESSFUL,
 				};
 				result.output_schema.ref_no = transaction_id;
@@ -89,14 +89,14 @@ app.getTransactionInvoice = async (req, res) => {
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: errorMessages.NOT_PROJECT_OWNER,
 			};
 			result.output_schema = null;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: errorMessages.NOT_LOGGED_IN,
 		};
 		result.output_schema = null;
@@ -132,27 +132,27 @@ app.getTransactionDetailsClientTask = async (req, res) => {
 
 			if (transaction_result instanceof Error) {
 				result.error_schema = {
-					error_code: 403,
+					error_code: "403",
 					error_message: errorMessages.DATA_NOT_FOUND,
 				};
 				result.output_schema = {};
 			} else {
 				result.error_schema = {
-					error_code: 200,
+					error_code: "200",
 					error_message: errorMessages.QUERY_SUCCESSFUL,
 				};
 				result.output_schema.transaction_detail = transaction_result;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: errorMessages.NOT_PROJECT_OWNER,
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: errorMessages.NOT_LOGGED_IN,
 		};
 		result.output_schema = {};
@@ -188,27 +188,27 @@ app.getTransactionDetailsFreelancerTask = async (req, res) => {
 
 			if (transaction_result instanceof Error) {
 				result.error_schema = {
-					error_code: 999,
+					error_code: "999",
 					error_message: errorMessages.DATA_NOT_FOUND,
 				};
 				result.output_schema = {};
 			} else {
 				result.error_schema = {
-					error_code: 200,
+					error_code: "200",
 					error_message: errorMessages.QUERY_SUCCESSFUL,
 				};
 				result.output_schema.transaction_detail = transaction_result;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: errorMessages.NOT_PROJECT_OWNER,
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: errorMessages.NOT_LOGGED_IN,
 		};
 		result.output_schema = {};
@@ -241,27 +241,27 @@ app.getClientTransactionActivity = async (req, res) => {
 
 			if (transaction_result instanceof Error) {
 				result.error_schema = {
-					error_code: 999,
+					error_code: "999",
 					error_message: errorMessages.DATA_NOT_FOUND,
 				};
 				result.output_schema = {};
 			} else {
 				result.error_schema = {
-					error_code: 200,
+					error_code: "200",
 					error_message: errorMessages.QUERY_SUCCESSFUL,
 				};
 				result.output_schema.activity = transaction_result;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: errorMessages.NOT_PROJECT_OWNER,
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: errorMessages.NOT_LOGGED_IN,
 		};
 		result.output_schema = {};
@@ -296,27 +296,27 @@ app.getTransactionDetailsClientService = async (req, res) => {
 
 			if (transaction_result instanceof Error) {
 				result.error_schema = {
-					error_code: 999,
+					error_code: "999",
 					error_message: errorMessages.DATA_NOT_FOUND,
 				};
 				result.output_schema = {};
 			} else {
 				result.error_schema = {
-					error_code: 200,
+					error_code: "200",
 					error_message: errorMessages.QUERY_SUCCESSFUL,
 				};
 				result.output_schema.transaction_detail = transaction_result;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: errorMessages.NOT_PROJECT_OWNER,
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: errorMessages.NOT_LOGGED_IN,
 		};
 		result.output_schema = {};
@@ -353,27 +353,27 @@ app.getTransactionDetailsFreelancerService = async (req, res) => {
 
 			if (transaction_result instanceof Error) {
 				result.error_schema = {
-					error_code: 999,
+					error_code: "999",
 					error_message: errorMessages.DATA_NOT_FOUND,
 				};
 				result.output_schema = {};
 			} else {
 				result.error_schema = {
-					error_code: 200,
+					error_code: "200",
 					error_message: errorMessages.QUERY_SUCCESSFUL,
 				};
 				result.output_schema.transaction_detail = transaction_result;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: errorMessages.NOT_PROJECT_OWNER,
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: errorMessages.NOT_LOGGED_IN,
 		};
 		result.output_schema = {};

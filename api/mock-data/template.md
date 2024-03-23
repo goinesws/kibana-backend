@@ -26,7 +26,7 @@
 
     } else {
     	result.error_schema = {
-    		error_code: 403,
+    		error_code: '403',
     		error_message: errorMessages.NOT_LOGGED_IN,
     	};
     	result.output_schema = {};

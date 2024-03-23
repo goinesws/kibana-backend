@@ -19,16 +19,20 @@ app.getClientReview = async (req, res) => {
 
 	if (client_review == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = client_review;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getClientTask = async (req, res) => {
@@ -43,16 +47,20 @@ app.getClientTask = async (req, res) => {
 
 	if (task == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.tasks = task;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.registerAsFreelancer = async (req, res) => {
@@ -130,26 +138,36 @@ app.registerAsFreelancer = async (req, res) => {
 
 		if (reg_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Registrasi Gagal.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema = {};
 		}
+
+		res.status(400).send(result);
+		return;
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 module.exports = app;

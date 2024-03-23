@@ -1,46 +1,60 @@
-const express = require('express');
+const express = require("express");
 const app = express();
-const Category = require('../models/categoryModel.js');
+const Category = require("../models/categoryModel.js");
 
-app.getAllCategorySubcategory = async (req, res) =>  {
-    var result = {};
-    result.error_schema = {};
-    result.output_schema = {categories: ''};
-  
-    const catInstance = new Category();
-    var subcatResult = await catInstance.getAllCategorySubcategory();
-  
-    if (Array.isArray(subcatResult) && subcatResult.length === 0) {
-      result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
-      result.output_schema.categories = subcatResult;
-    } else {
-      result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
-      result.output_schema.categories = subcatResult;
-    }
-  
-    res.send(result);
-  }
+app.getAllCategorySubcategory = async (req, res) => {
+	var result = {};
+	result.error_schema = {};
+	result.output_schema = { categories: "" };
+
+	const catInstance = new Category();
+	var subcatResult = await catInstance.getAllCategorySubcategory();
+
+	if (Array.isArray(subcatResult) && subcatResult.length === 0) {
+		result.error_schema = {
+			error_code: "903",
+			error_message: "Tidak ada data yang ditemukan.",
+		};
+		result.output_schema.categories = subcatResult;
+
+		res.status(400).send(result);
+		return;
+	} else {
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
+		result.output_schema.categories = subcatResult;
+	}
+
+	res.send(result);
+	return;
+};
 
 app.getAllCategorySubcategoryTask = async (req, res) => {
-  var result = {};
+	var result = {};
 
-  result.error_schema = {};
-  result.output_schema = {categories: ''};
+	result.error_schema = {};
+	result.output_schema = { categories: "" };
 
-  const catInstance = new Category();
-  let category = await catInstance.getAllCategorySubcategoryTask();
+	const catInstance = new Category();
+	let category = await catInstance.getAllCategorySubcategoryTask();
 
-  // console.log(taskResult);
+	// console.log(taskResult);
 
-  if (category == null) {
-    result.error_schema = {'error_code': 903, 'error_message': 'Tidak ada data yang ditemukan.'};
-    result.output_schema.categories = category;
-  } else {
-    result.error_schema = {'error_code': 200, 'error_message': 'Sukses'};
-    result.output_schema.categories = category;
-  }
+	if (category == null) {
+		result.error_schema = {
+			error_code: "903",
+			error_message: "Tidak ada data yang ditemukan.",
+		};
+		result.output_schema.categories = category;
 
-  res.send(result);
-}
+		res.status(400).send(result);
+		return;
+	} else {
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
+		result.output_schema.categories = category;
+	}
+
+	res.send(result);
+	return;
+};
 
 module.exports = app;

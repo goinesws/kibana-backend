@@ -16,16 +16,19 @@ app.getNewTask = async (req, res) => {
 	// console.log(taskResult);
 	if (task_result instanceof Error) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+		res.send(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.tasks = task_result;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getNewTaskByCategory = async (req, res) => {
@@ -44,16 +47,19 @@ app.getNewTaskByCategory = async (req, res) => {
 
 	if (taskResult == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+		res.send(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.tasks = taskResult;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getTaskDetails = async (req, res) => {
@@ -69,16 +75,19 @@ app.getTaskDetails = async (req, res) => {
 
 	if (taskDetailResult == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+		res.send(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = taskDetailResult;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getTaskList = async (req, res) => {
@@ -96,10 +105,12 @@ app.getTaskList = async (req, res) => {
 
 	if (taskListResult instanceof Error) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+		res.send(400).send(result);
+		return;
 	} else {
 		if (req.body.last_id !== "" && req.body.last_id) {
 			const indexOfTarget = taskListResult.findIndex(
@@ -123,12 +134,14 @@ app.getTaskList = async (req, res) => {
 
 		if (taskListResult == "" || taskListResult == null) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Tidak ada data yang ditemukan.",
 			};
 			result.output_schema = {};
+			res.send(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema.tasks = taskListResult;
 			result.output_schema.total_amount = total_amount;
 			result.output_schema.has_next_page = has_next_page;
@@ -138,6 +151,7 @@ app.getTaskList = async (req, res) => {
 	}
 
 	res.send(result);
+	return;
 };
 
 app.createTask = async (req, res) => {
@@ -164,25 +178,30 @@ app.createTask = async (req, res) => {
 
 		if (create_task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Gagal membuat tugas baru.",
 			};
 			result.output_schema = {};
+			res.send(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+		res.send(400).send(result);
+		return;
 	}
 	res.send(result);
+	return;
 };
 
 app.getOwnedTask = async (req, res) => {
@@ -206,25 +225,30 @@ app.getOwnedTask = async (req, res) => {
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Gagal Mendapatkan Data.",
 			};
 			result.output_schema = {};
+			res.send(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema.tasks = task_result;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+		res.send(400).send(result);
+		return;
 	}
 	res.send(result);
+	return;
 };
 
 app.getOwnedTaskDetails = async (req, res) => {
@@ -246,25 +270,32 @@ app.getOwnedTaskDetails = async (req, res) => {
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Gagal Mengambil Data.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema.task_detail = task_result;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 	res.send(result);
+	return;
 };
 
 app.getRegisteredFreelancer = async (req, res) => {
@@ -289,25 +320,32 @@ app.getRegisteredFreelancer = async (req, res) => {
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Gagal Mendapatkan Data.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema = task_result;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 	res.send(result);
+	return;
 };
 
 app.deleteTask = async (req, res) => {
@@ -329,26 +367,33 @@ app.deleteTask = async (req, res) => {
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Gagal Menghapus Data.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema = {};
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getTaskHistory = async (req, res) => {
@@ -373,26 +418,33 @@ app.getTaskHistory = async (req, res) => {
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Gagal mendapatkan data.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 200,
+				error_code: "200",
 				error_message: "Sukses.",
 			};
 			result.output_schema = task_result;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getTaskHistoryDetails = async (req, res) => {
@@ -417,26 +469,33 @@ app.getTaskHistoryDetails = async (req, res) => {
 
 		if (task_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Terjadi Kegagalan.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
 			result.error_schema = {
-				error_code: 403,
-				error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
+				error_code: "200",
+				error_message: "Sukses.",
 			};
 			result.output_schema.task_detail = task_result;
 		}
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.chooseFreelancer = async (req, res) => {
@@ -452,13 +511,17 @@ app.chooseFreelancer = async (req, res) => {
 	if (curr_session.session_id == x_token) {
 	} else {
 		result.error_schema = {
-			error_code: 403,
+			error_code: "403",
 			error_message: "Anda tidak memiliki hak untuk melakukan hal tersebut.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 module.exports = app;

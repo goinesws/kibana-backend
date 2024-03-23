@@ -20,12 +20,15 @@ app.loginFunction = async (req, res) => {
 		login_info == null ||
 		login_info == undefined
 	) {
-		result.error_schema = { error_code: 903, error_message: "Login Gagal." };
+		result.error_schema = { error_code: "903", error_message: "Login Gagal." };
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
 		let x_token = req.session.id;
 		// remove freelancer_id dari login_info
-		result.error_schema = { error_code: 200, error_message: "Sukses." };
+		result.error_schema = { error_code: "200", error_message: "Sukses." };
 		result.output_schema = login_info;
 		result.output_schema.token = x_token;
 
@@ -46,14 +49,21 @@ app.loginFunction = async (req, res) => {
 		);
 
 		if (write_session_result instanceof Error) {
-			result.error_schema = { error_code: 903, error_message: "Login Gagal." };
+			result.error_schema = {
+				error_code: "903",
+				error_message: "Login Gagal.",
+			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		}
 
 		delete login_info["freelancer_id"];
 	}
 
 	res.send(result);
+	return;
 };
 
 // done refactor
@@ -81,13 +91,16 @@ app.registerFunction = async (req, res) => {
 
 	if (register_result instanceof Error) {
 		result.error_schema = {
-			error_code: 999,
+			error_code: "999",
 			error_message: "Registrasi Gagal.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
 		x_token = req.session.id;
-		result.error_schema = { error_code: 200, error_message: "Sukses." };
+		result.error_schema = { error_code: "200", error_message: "Sukses." };
 		result.output_schema = register_result;
 		result.output_schema.is_freelancer = false;
 		result.output_schema.is_connected_bank = false;
@@ -108,14 +121,17 @@ app.registerFunction = async (req, res) => {
 
 		if (write_session_result instanceof Error) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Registrasi Gagal.",
 			};
 			result.output_schema = {};
+			res.status(400).send(result);
+			return;
 		}
 	}
 
 	res.send(result);
+	return;
 };
 
 // pindah ke client controller
@@ -130,12 +146,12 @@ app.registerFreelancerFunction = async (req, res) => {
 
 	if (output_schema == null) {
 		result.error_schema = {
-			error_code: 999,
+			error_code: "999",
 			error_message: "Registration Failed.",
 		};
 		result.output_schema = {};
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Success" };
+		result.error_schema = { error_code: "200", error_message: "Success" };
 		result.output_schema = output_schema;
 	}
 
@@ -159,17 +175,24 @@ app.logoutFunction = async (req, res) => {
 
 		if (logout_result instanceof Error) {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Logout Failed.",
 			};
 			result.output_schema = {};
+			res.status(400).send(result);
+			return;
 		}
 
-		result.error_schema = { error_code: 200, error_message: "Success" };
+		result.error_schema = { error_code: "200", error_message: "Success" };
 		result.output_schema = {};
 	} else {
-		result.error_schema = { error_code: 999, error_message: "Logout Failed." };
+		result.error_schema = {
+			error_code: "999",
+			error_message: "Logout Failed.",
+		};
 		result.output_schema = {};
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
@@ -189,17 +212,20 @@ app.getOtherProfile = async (req, res) => {
 
 	if (clientDetails == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = null;
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema = clientDetails;
 		result.output_schema.is_freelancer = isFreelancer;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getMyProfile = async (req, res) => {
@@ -223,17 +249,21 @@ app.getMyProfile = async (req, res) => {
 		me = await userInstance.getMyProfile(curr_session.session_data.client_id);
 		if (me == null) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Tidak ada data yang ditemukan.",
 			};
 			result.output_schema = null;
+			res.send(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema = me;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = null;
+		res.send(400).send(result);
+		return;
 	}
 
 	res.send(result);
@@ -259,17 +289,21 @@ app.getMyBankDetails = async (req, res) => {
 		);
 		if (bank == null) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Tidak ada data yang ditemukan.",
 			};
 			result.output_schema = null;
+			res.send(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema.bank_detail = bank;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = null;
+		res.send(400).send(result);
+		return;
 	}
 
 	res.send(result);
@@ -305,18 +339,23 @@ app.editMyProfile = async (req, res) => {
 		let user_edit = await userInstance.editMyprofile(userId, data, images[0]);
 
 		if (user_edit instanceof Error) {
-			result.error_schema = { error_code: 999, error_message: "Gagal." };
+			result.error_schema = { error_code: "999", error_message: "Gagal." };
 			result.output_schema = {};
+			res.send(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Success." };
+			result.error_schema = { error_code: "200", error_message: "Success." };
 			result.output_schema = {};
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = null;
+		res.send(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.editBankDetails = async (req, res) => {
@@ -339,17 +378,20 @@ app.editBankDetails = async (req, res) => {
 				curr_session.session_data.client_id,
 				req.body
 			);
-			result.error_schema = { error_code: 200, error_message: "Success." };
+			result.error_schema = { error_code: "200", error_message: "Success." };
 			result.output_schema = {};
-		} catch {
-			result.error_schema = { error_code: 999, error_message: "Gagal." };
+		} catch (error) {
+			result.error_schema = { error_code: "999", error_message: "Gagal." };
 			result.output_schema = {};
+			res.send(400).send(result);
+			return;
 		}
 		res.send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = {};
-		res.send(result);
+		res.send(400).send(result);
 		return;
 	}
 };

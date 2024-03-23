@@ -25,16 +25,20 @@ app.getNewService = async (req, res) => {
 
 	if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.services = serviceResult;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getServiceByCategory = async (req, res) => {
@@ -49,16 +53,20 @@ app.getServiceByCategory = async (req, res) => {
 
 	if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.services = serviceResult;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getServiceList = async (req, res) => {
@@ -95,12 +103,15 @@ app.getServiceList = async (req, res) => {
 
 	if (serviceListResult == "" || serviceListResult == null) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.services = serviceListResult;
 		result.output_schema.total_amount = total_amount;
 		result.output_schema.has_next_page = has_next_page;
@@ -109,6 +120,7 @@ app.getServiceList = async (req, res) => {
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getServiceDetail = async (req, res) => {
@@ -130,18 +142,22 @@ app.getServiceDetail = async (req, res) => {
 
 	if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 		result.error_schema = {
-			error_code: 903,
+			error_code: "903",
 			error_message: "Tidak ada data yang ditemukan.",
 		};
 		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	} else {
-		result.error_schema = { error_code: 200, error_message: "Sukses" };
+		result.error_schema = { error_code: "200", error_message: "Sukses" };
 		result.output_schema.service_detail = serviceResult;
 		result.output_schema.freelancer = freelancerResult;
 		result.output_schema.review = reviewResult;
 	}
 
 	res.send(result);
+	return;
 };
 
 const storage = multer.memoryStorage();
@@ -183,21 +199,28 @@ app.createNewService = async (req, res) => {
 
 		if (newServiceId == "") {
 			result.error_schema = {
-				error_code: 999,
+				error_code: "999",
 				error_message: "Gagal membuat service baru",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses." };
+			result.error_schema = { error_code: "200", error_message: "Sukses." };
 			result.output_schema = {};
 			result.output_schema.id = newServiceId;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = null;
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getOwnedService = async (req, res) => {
@@ -218,20 +241,27 @@ app.getOwnedService = async (req, res) => {
 
 		if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Tidak ada data yang ditemukan.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema.services = serviceResult;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = null;
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getOwnedServiceDetail = async (req, res) => {
@@ -263,27 +293,37 @@ app.getOwnedServiceDetail = async (req, res) => {
 
 			if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 				result.error_schema = {
-					error_code: 903,
+					error_code: "903",
 					error_message: "Tidak ada data yang ditemukan.",
 				};
 				result.output_schema = {};
+
+				res.status(400).send(result);
+				return;
 			} else {
-				result.error_schema = { error_code: 200, error_message: "Sukses" };
+				result.error_schema = { error_code: "200", error_message: "Sukses" };
 				result.output_schema.service_detail = serviceResult;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: "Not the owner of this service.",
 			};
-			result.output_schema = null;
+			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
-		result.output_schema = null;
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
+		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.getOwnedServiceOrders = async (req, res) => {
@@ -310,27 +350,37 @@ app.getOwnedServiceOrders = async (req, res) => {
 
 			if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 				result.error_schema = {
-					error_code: 903,
+					error_code: "903",
 					error_message: "Tidak ada data yang ditemukan.",
 				};
 				result.output_schema = {};
+
+				res.status(400).send(result);
+				return;
 			} else {
-				result.error_schema = { error_code: 200, error_message: "Sukses" };
+				result.error_schema = { error_code: "200", error_message: "Sukses" };
 				result.output_schema.transactions = serviceResult;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: "Not the owner of this service.",
 			};
-			result.output_schema = null;
+			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
 		result.output_schema = null;
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.deactivateService = async (req, res) => {
@@ -355,27 +405,37 @@ app.deactivateService = async (req, res) => {
 
 			if (serviceResult == null) {
 				result.error_schema = {
-					error_code: 903,
+					error_code: "903",
 					error_message: "Deactivate gagal.",
 				};
 				result.output_schema = {};
+
+				res.status(400).send(result);
+				return;
 			} else {
-				result.error_schema = { error_code: 200, error_message: "Sukses" };
+				result.error_schema = { error_code: "200", error_message: "Sukses" };
 				result.output_schema.transactions = serviceResult;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: "Not the owner of this service.",
 			};
-			result.output_schema = null;
+			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
-		result.output_schema = null;
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
+		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 app.deleteService = async (req, res) => {
@@ -400,27 +460,37 @@ app.deleteService = async (req, res) => {
 
 			if (serviceResult == null) {
 				result.error_schema = {
-					error_code: 903,
+					error_code: "903",
 					error_message: "Delete gagal.",
 				};
 				result.output_schema = {};
+
+				res.status(400).send(result);
+				return;
 			} else {
-				result.error_schema = { error_code: 200, error_message: "Sukses" };
+				result.error_schema = { error_code: "200", error_message: "Sukses" };
 				result.output_schema.transactions = serviceResult;
 			}
 		} else {
 			result.error_schema = {
-				error_code: 403,
+				error_code: "403",
 				error_message: "Not the owner of this service.",
 			};
-			result.output_schema = null;
+			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
-		result.output_schema = null;
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
+		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
+	return;
 };
 
 //from client
@@ -446,17 +516,23 @@ app.getServiceHistory = async (req, res) => {
 
 		if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 			result.error_schema = {
-				error_code: 903,
+				error_code: "903",
 				error_message: "Tidak ada data yang ditemukan.",
 			};
 			result.output_schema = {};
+
+			res.status(400).send(result);
+			return;
 		} else {
-			result.error_schema = { error_code: 200, error_message: "Sukses" };
+			result.error_schema = { error_code: "200", error_message: "Sukses" };
 			result.output_schema.service_detail = serviceResult;
 		}
 	} else {
-		result.error_schema = { error_code: 403, error_message: "Forbidden." };
-		result.output_schema = null;
+		result.error_schema = { error_code: "403", error_message: "Forbidden." };
+		result.output_schema = {};
+
+		res.status(400).send(result);
+		return;
 	}
 
 	res.send(result);
