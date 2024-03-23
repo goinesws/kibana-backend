@@ -233,4 +233,43 @@ module.exports = class Review {
 			return new Error("Gagal Insert Review.");
 		}
 	}
+  
+  async getServiceReview(service_id) {
+		try {
+			var SP = `SELECT 
+            (SELECT AVG(rating)
+            FROM
+              review
+            WHERE
+            destination_id = service.service_id) as average_rating,
+            (SELECT COUNT(rating)
+            FROM 
+            review
+            WHERE 
+            destination_id = service.service_id) as rating_amount,
+        (SELECT
+                  jsonb_agg(
+                    jsonb_build_object(
+              'name', client.name,
+              'star', review.rating,
+              'description', review.content,
+              'timestamp', TO_CHAR(review.date, 'DD Mon YYYY')
+                    )
+                  )
+                FROM 
+                  review
+                JOIN 
+                  client on client.client_id = review.writer_id
+                WHERE 
+                  review.destination_id = service.service_id
+                ) AS review_list
+            FROM service
+        WHERE service_id = '${service_id}'
+        ORDER BY service.created_date DESC`;
+			const result = await db.any(SP);
+			return result[0];
+		} catch (error) {
+			throw new Error("Failed to fetch user tasks");
+		}
+	}
 };
