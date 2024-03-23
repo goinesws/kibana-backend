@@ -3,6 +3,7 @@ const app = express();
 const Service = require("../models/serviceModel.js");
 const Freelancer = require("../models/freelancerModel.js");
 const User = require("../models/userModel.js");
+const Review = require("../models/reviewModel.js");
 const Subcategory = require("../models/subcategoryModel.js");
 var bodyParser = require("body-parser");
 var multer = require("multer");
@@ -138,7 +139,8 @@ app.getServiceDetail = async (req, res) => {
 		service_id
 	);
 
-	var reviewResult = await serviceInstance.getServiceReview(service_id);
+	let reviewInstance = new Review();
+	var reviewResult = await reviewInstance.getServiceReview(service_id);
 
 	if (Array.isArray(serviceResult) && serviceResult.length === 0) {
 		result.error_schema = {
